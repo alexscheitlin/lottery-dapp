@@ -5,7 +5,20 @@ import getWeb3 from "./utils/getWeb3";
 import "./App.css";
 
 class App extends Component {
-  state = { storageValue: 0, web3: null, accounts: null, contract: null };
+  state = {
+    storageValueWei: 0,
+    web3: null,
+    accounts: null,
+    contract: null
+  };
+
+  etherToWei = (value) => {
+    return value * 1000000000000000000;
+  }
+
+  weiToEther = (value) => {
+    return value / 1000000000000000000;
+  }
 
   componentDidMount = async () => {
     try {
@@ -38,15 +51,29 @@ class App extends Component {
   runExample = async () => {
     const { accounts, contract } = this.state;
 
-    // Stores a given value, 5 by default.
-    await contract.methods.set(5).send({ from: accounts[0] });
+    // send a given value of wei to the smart contract
+    const value = this.etherToWei(1);
+    await contract.methods.sendWei().send({ from: accounts[0], value: value });
 
-    // Get the value from the contract to prove it worked.
-    const response = await contract.methods.get().call();
+    // get the account balance from of the smart contract
+    const response = await contract.methods.getContractBalance().call();
 
-    // Update state with the result.
-    this.setState({ storageValue: response });
+    // update state with the result
+    this.setState({ storageValueWei: response });
   };
+
+  getMoneyBack = async () => {
+    const { accounts, contract } = this.state;
+
+    // get the whole account balance of the smart contract
+    await contract.methods.getBack().send({ from: accounts[0] });
+
+    // get the account balance from of the smart contract
+    const response = await contract.methods.getContractBalance().call();
+
+    // update state with the result
+    this.setState({ storageValueWei: response });
+  }
 
   render() {
     if (!this.state.web3) {
@@ -59,12 +86,15 @@ class App extends Component {
         <h2>Smart Contract Example</h2>
         <p>
           If your contracts compiled and migrated successfully, below will show
-          a stored value of 5 (by default).
+          a stored value of 1 (by default).
         </p>
         <p>
-          Try changing the value stored on <strong>line 40</strong> of App.js.
+          Try changing the value stored on <strong>line 55</strong> of App.js.
         </p>
-        <div>The stored value is: {this.state.storageValue}</div>
+        <div>The stored value is: {this.state.storageValueWei} Wei</div>
+        <div>The stored value is: {this.weiToEther(this.state.storageValueWei)} Ether</div>
+
+        <button onClick={this.getMoneyBack}>Hit Me To Get Your Money Back</button>
       </div>
     );
   }

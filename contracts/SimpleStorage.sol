@@ -1,13 +1,16 @@
 pragma solidity ^0.5.0;
 
-contract SimpleStorage {
-  uint storedData;
+contract SimpleStorage{
+    // transfer a given amount of wei from sender to smart contract
+    function sendWei() payable public {}
 
-  function set(uint x) public {
-    storedData = x;
-  }
+    // transfer the whole smart contract's account balance to the sender
+    function getBack() public{
+        msg.sender.transfer(address(this).balance);
+    }
 
-  function get() public view returns (uint) {
-    return storedData;
-  }
+    // return the smart contract's account balance
+    function getContractBalance() public view returns(uint){
+        return address(this).balance;
+    }
 }
