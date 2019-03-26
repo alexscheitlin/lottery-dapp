@@ -9,7 +9,9 @@ class App extends Component {
     storageValueWei: 0,
     web3: null,
     accounts: null,
-    contract: null
+    contract: null,
+    activeAccount: null,
+    activeAccountBalance: -1
   };
 
   etherToWei = (value) => {
@@ -17,7 +19,7 @@ class App extends Component {
   }
 
   weiToEther = (value) => {
-    return value / 1000000000000000000;
+    return Math.round(value / 1000000000000000000 * 100)/100;
   }
 
   componentDidMount = async () => {
@@ -27,6 +29,10 @@ class App extends Component {
 
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
+
+      // Get the currently active account and its balance
+      const activeAccount = accounts[0];
+      const activeAccountBalance = await web3.eth.getBalance(activeAccount);
 
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
@@ -38,7 +44,7 @@ class App extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance }, this.init);
+      this.setState({ web3, accounts, contract: instance, activeAccount,  activeAccountBalance }, this.init);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -46,7 +52,31 @@ class App extends Component {
       );
       console.error(error);
     }
+
+    // check every second whether the account was changed in metamask or not
+    setInterval(() =>   {
+      this.checkForAccountChange();
+    }, 1000);
   };
+
+  checkForAccountChange = async () => {
+    const { web3, accounts, activeAccount, activeAccountBalance } = this.state;
+
+    const newAccounts = await web3.eth.getAccounts();
+    if (accounts !== newAccounts) {
+      this.setState({ accounts: newAccounts });
+    }
+
+    const newActiveAccount = newAccounts[0];
+    if (activeAccount !== newActiveAccount) {
+      this.setState({ activeAccount: newActiveAccount });
+    }
+
+    const newActiveAccountBalance = await web3.eth.getBalance(newActiveAccount);
+    if (activeAccountBalance !== newActiveAccountBalance) {
+      this.setState({ activeAccountBalance: newActiveAccountBalance });
+    }
+  }
 
   init = async () => {
     const { contract } = this.state;
@@ -95,11 +125,12 @@ class App extends Component {
         <p>
           Try changing the value stored on <strong>line 55</strong> of App.js.
         </p>
-        <div>The stored value is: {this.state.storageValueWei} Wei</div>
+        <div>Your Account: {this.state.activeAccount}</div>
+        <div>Your Balance: {this.weiToEther(this.state.activeAccountBalance)} Ether</div>
         <div>The stored value is: {this.weiToEther(this.state.storageValueWei)} Ether</div>
 
-        <button onClick={this.sendMoney}>Hit Me To Send Money</button>
-        <button onClick={this.getMoneyBack}>Hit Me To Get Your Money Back</button>
+        <div><button onClick={this.sendMoney}>Hit Me To Send Money</button></div>
+        <div><button onClick={this.getMoneyBack}>Hit Me To Get Your Money Back</button></div>
       </div>
     );
   }
