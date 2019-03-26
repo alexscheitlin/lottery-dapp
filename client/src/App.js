@@ -38,7 +38,7 @@ class App extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance }, this.runExample);
+      this.setState({ web3, accounts, contract: instance }, this.init);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -48,18 +48,25 @@ class App extends Component {
     }
   };
 
-  runExample = async () => {
-    const { accounts, contract } = this.state;
-
-    // send a given value of wei to the smart contract
-    const value = this.etherToWei(1);
-    await contract.methods.sendWei().send({ from: accounts[0], value: value });
+  init = async () => {
+    const { contract } = this.state;
 
     // get the account balance from of the smart contract
     const response = await contract.methods.getContractBalance().call();
 
     // update state with the result
     this.setState({ storageValueWei: response });
+  }
+
+  sendMoney = async () => {
+    const { accounts, contract } = this.state;
+
+    // send a given value of wei to the smart contract
+    const value = this.etherToWei(1);
+    await contract.methods.sendWei().send({ from: accounts[0], value: value });
+
+    // update state with stored value of wei
+    this.setState({ storageValueWei: await contract.methods.getContractBalance().call() });
   };
 
   getMoneyBack = async () => {
@@ -68,11 +75,8 @@ class App extends Component {
     // get the whole account balance of the smart contract
     await contract.methods.getBack().send({ from: accounts[0] });
 
-    // get the account balance from of the smart contract
-    const response = await contract.methods.getContractBalance().call();
-
-    // update state with the result
-    this.setState({ storageValueWei: response });
+    // update state with stored value of wei
+    this.setState({ storageValueWei: await contract.methods.getContractBalance().call() });
   }
 
   render() {
@@ -94,6 +98,7 @@ class App extends Component {
         <div>The stored value is: {this.state.storageValueWei} Wei</div>
         <div>The stored value is: {this.weiToEther(this.state.storageValueWei)} Ether</div>
 
+        <button onClick={this.sendMoney}>Hit Me To Send Money</button>
         <button onClick={this.getMoneyBack}>Hit Me To Get Your Money Back</button>
       </div>
     );
