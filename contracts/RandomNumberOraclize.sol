@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
-import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
-
+// import "http://github.com/oraclize/ethereum-api/oraclizeAPI_0.5.sol";
+import "./oraclizeAPI_0.5.sol";
 
 // Again does not work with Ganache and remix IDE! Only on any of the official testnets such as Ropsten.
 contract RandomNumberOraclize is usingOraclize {
