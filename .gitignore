@@ -3,3 +3,5 @@
 
 # macos file
 contracts/.DS_Store
+
+ganache-server/node_modules
