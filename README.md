@@ -48,7 +48,7 @@ sudo npm install -g truffle
 
 ### Setup Metamask
 
-1. Start `Ganache` and copy the _RPC Server_ address (most likely: `HTTP://.127.0.0.1:7545`).
+1. Start `Ganache` and copy the _RPC Server_ address (most likely: `http://127.0.0.1:7545`).
 2. Open `Metamask` in your browser and login with your wallet.
 3. Click on the network dropdown and select _Custom RPC_.
 4. Scroll down and enter the copied `RPC Server` of `Ganache` into the _New RPC URL_ field.
