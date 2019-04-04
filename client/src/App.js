@@ -4,6 +4,7 @@ import getWeb3 from "./utils/getWeb3";
 
 import Wrapper from './Components/Wrapper';
 import Loading from './Components/Loading';
+import SiteHeader from './Components/SiteHeader';
 
 import UserInformation from './Components/UserInformation';
 import ContractInteraction from './Components/ContractInteraction';
@@ -123,7 +124,10 @@ class App extends Component {
 
   render() {
     return (
+      <div>
+      <SiteHeader />
       <Wrapper>
+        
         <Grid>
           <Grid.Row>
             <Grid.Column width={6}>
@@ -150,6 +154,7 @@ class App extends Component {
           </Grid.Row>
         </Grid>
       </Wrapper>
+      </div>
     )
 
   }
