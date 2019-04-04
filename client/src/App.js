@@ -78,7 +78,7 @@ class App extends Component {
     // check every second whether the account was changed in metamask or not
     setInterval(() => {
       this.checkForAccountChange();
-    }, 1000);
+    }, 2000);
   };
 
   checkForAccountChange = async () => {
@@ -143,7 +143,14 @@ class App extends Component {
           <Grid>
             <Grid.Row>
               <Grid.Column>
-                <Lottery />
+                {
+                  this.state.web3 ?
+                  <Lottery 
+                    activeAccount={this.state}
+                  /> :
+                  null
+                }
+                
               </Grid.Column>
             </Grid.Row>
             <Grid.Row>

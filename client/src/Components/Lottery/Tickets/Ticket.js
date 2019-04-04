@@ -1,11 +1,10 @@
 import React from 'react'
 
-import { Segment, Header } from "semantic-ui-react";
+import { Segment } from "semantic-ui-react";
 
 const ticket = (props) => (
   <Segment>
-    <Header>Ticket Component</Header>
-    <div>Information about 1 ticket</div>
+    <div>Ticket #{props.index} | bought for <strong>number {props.number}</strong></div>
   </Segment>
 )
 
