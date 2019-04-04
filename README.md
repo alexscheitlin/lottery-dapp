@@ -12,7 +12,9 @@ truffle unbox react
 - [Git](https://git-scm.com/) command line interface
 - [Node.js](https://nodejs.org/) command line interface
 - [Metamask Extension](https://metamask.io/) for your browser (including wallet)
-- [Ganache](https://truffleframework.com/ganache) desktop application
+- [Ganache-CLI](https://github.com/trufflesuite/ganache-cli) to spin up a blockchain with instant mining
+
+> We **don't** use [Ganache](https://truffleframework.com/ganache) at the moment, as it fails somehow. Everything works though with Ganache-CLI. If at some point we switch back, the README should be updated.
 
 ## Setup
 
@@ -46,16 +48,27 @@ npm install -g truffle
 sudo npm install -g truffle
 ```
 
+### Install Ganache-CLI
+Install with `@beta` to get the latest updates which fixes a bug that caused wrong gas estimations ([more details](https://github.com/trufflesuite/ganache-cli/releases/tag/v6.4.2-beta.0)).
+
+```bash
+npm install -g ganache-cli@beta
+
+# or
+
+sudo npm install -g ganache-cli@beta
+```
+
 ### Setup Metamask
 
-1. Start `Ganache` and copy the _RPC Server_ address (most likely: `http://127.0.0.1:7545`).
+1. Start a local blockchain with `ganache-cli` in a terminal - which will most likely be running on: `http://127.0.0.1:8545`).
 2. Open `Metamask` in your browser and login with your wallet.
 3. Click on the network dropdown and select _Custom RPC_.
-4. Scroll down and enter the copied `RPC Server` of `Ganache` into the _New RPC URL_ field.
+4. Scroll down and enter the copied `RPC Server` of `ganache-cli` into the _New RPC URL_ field.
 5. Hit _Save_.
-6. Go to `Ganache` an click the _key symbol_ to the very right of the first address to copy this address' private key.
+6. Switch to your `ganache-cli` an copy one of the private keys.
 7. Back in `Metamask`, click on the _colored circle_ on the top right and select _Import Account_.
-8. Paste the private key from `Ganache` and hit _Import_. You should no be logged in with an Account from the `Ganache` network with a balance of _100 ETH_.
+8. Paste the private key from `ganache-cli` and hit _Import_. You should now be logged in with an Account from the `ganache-cli` network with a balance of _100 ETH_.
 
 ## Run Environment
 
@@ -67,7 +80,7 @@ _everytime to run the environment_
    cd /path/to/lottery-dapp
    git pull
    ```
-2. Start `Ganache`.
+2. Start local blockchain with `ganache-cli`.
 3. Compile the `Smart Contracts`:
    ```bash
    # Terminal Tab #1
@@ -90,4 +103,4 @@ _everytime to run the environment_
    npm install
    npm start
    ```
-6. Go to `localhost:3000` in your browser, accept the transaction and the page should display that a value of _5_ is stored.
+6. `localhost:3000` should be opened automatically in your browser
