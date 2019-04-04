@@ -1,34 +1,49 @@
 import React, { Component } from "react";
 
+import NumberGrid from "./NumberGrid";
+
 import { Segment, Header, Input, Button } from "semantic-ui-react";
 
 class Game extends Component {
   state = {
-    number: ""
-  }
+    numberGrid: [
+      1, 2, 3, 4, 5
+    ],
+    pressedNumber: -1
+  };
 
-  handleChange = (e) => {
+  handleChange = e => {
     this.setState({
       number: e.target.value
+    });
+  };
+
+  numberClickHandler = (number) => {
+    this.setState({
+      pressedNumber: number
     })
   }
 
   buyTicket = () => {
-    const ticketNumber = this.state.number;
+    const ticketNumber = this.state.pressedNumber;
     this.props.buyTicket(ticketNumber);
-  }
+  };
 
   render() {
     return (
-      <Segment>
-        <Header>Game Component</Header>
-        <div>Grid of Numbers</div>
-        <Input type="text" onChange={this.handleChange} placeholder='enter a number'/>
-        <Button onClick={this.buyTicket}>Buy Ticket</Button>
+      <Segment textAlign='center'>
+      <Header>
+        Select a Ticket to buy
+      </Header>
+        <NumberGrid 
+          numbers={this.state.numberGrid} 
+          activeNumber={this.state.pressedNumber}
+          onClick={this.numberClickHandler}
+          />
+        <Button secondary onClick={this.buyTicket}>Buy Ticket</Button>
       </Segment>
-    )
+    );
   }
-
 }
 
 export default Game;
