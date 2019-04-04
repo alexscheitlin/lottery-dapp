@@ -2,14 +2,14 @@ import React, { Component } from "react";
 
 import Ticket from './Ticket';
 
-import { Segment, Header } from "semantic-ui-react";
+import { Segment, Header, Card } from "semantic-ui-react";
 
 class Tickets extends Component {
 
   render() {
     return (
       <Segment>
-        <Header>Tickets for this account</Header>
+        <Card.Group>
         {
           this.props.tickets !== null ? 
             this.props.tickets.map((ticket, index) => {
@@ -23,6 +23,7 @@ class Tickets extends Component {
             }) :
             null
         }
+        </Card.Group>
       </Segment>
     )
   }
