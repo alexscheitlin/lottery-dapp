@@ -2,7 +2,7 @@ import React from 'react'
 import {Container} from 'semantic-ui-react';
 
 const wrapper = (props) => ( 
-  <Container >
+  <Container>
     {props.children}
   </Container>
 )

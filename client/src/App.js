@@ -2,18 +2,18 @@ import React, { Component } from "react";
 import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import getWeb3 from "./utils/getWeb3";
 
-import Wrapper from './Components/Wrapper';
-import Loading from './Components/Loading';
-import SiteHeader from './Components/SiteHeader';
+import Wrapper from "./Components/Wrapper";
+import Loading from "./Components/Loading";
+import SiteHeader from "./Components/SiteHeader";
 
-import UserInformation from './Components/UserInformation';
-import ContractInteraction from './Components/ContractInteraction';
+import UserInformation from "./Components/UserInformation";
+import ContractInteraction from "./Components/ContractInteraction";
 
-import Lottery from './Components/Lottery/Lottery';
+import Lottery from "./Components/Lottery/Lottery";
 
-import { Grid } from 'semantic-ui-react';
+import { Grid } from "semantic-ui-react";
 
-import 'semantic-ui-css/semantic.min.css';
+import "semantic-ui-css/semantic.min.css";
 
 import "./App.css";
 
@@ -27,13 +27,13 @@ class App extends Component {
     activeAccountBalance: -1
   };
 
-  etherToWei = (value) => {
+  etherToWei = value => {
     return value * 1000000000000000000;
-  }
+  };
 
-  weiToEther = (value) => {
-    return Math.round(value / 1000000000000000000 * 100) / 100;
-  }
+  weiToEther = value => {
+    return Math.round((value / 1000000000000000000) * 100) / 100;
+  };
 
   componentDidMount = async () => {
     try {
@@ -52,16 +52,25 @@ class App extends Component {
       const deployedNetwork = SimpleStorageContract.networks[networkId];
       const instance = new web3.eth.Contract(
         SimpleStorageContract.abi,
-        deployedNetwork && deployedNetwork.address,
+        deployedNetwork && deployedNetwork.address
       );
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance, activeAccount, activeAccountBalance }, this.init);
+      this.setState(
+        {
+          web3,
+          accounts,
+          contract: instance,
+          activeAccount,
+          activeAccountBalance
+        },
+        this.init
+      );
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
+        "Failed to load web3, accounts, or contract. Check console for details."
       );
       console.error(error);
     }
@@ -89,7 +98,7 @@ class App extends Component {
     if (activeAccountBalance !== newActiveAccountBalance) {
       this.setState({ activeAccountBalance: newActiveAccountBalance });
     }
-  }
+  };
 
   init = async () => {
     const { contract } = this.state;
@@ -99,7 +108,7 @@ class App extends Component {
 
     // update state with the result
     this.setState({ storageValueWei: response });
-  }
+  };
 
   sendMoney = async () => {
     const { accounts, contract } = this.state;
@@ -109,7 +118,9 @@ class App extends Component {
     await contract.methods.sendWei().send({ from: accounts[0], value: value });
 
     // update state with stored value of wei
-    this.setState({ storageValueWei: await contract.methods.getContractBalance().call() });
+    this.setState({
+      storageValueWei: await contract.methods.getContractBalance().call()
+    });
   };
 
   getMoneyBack = async () => {
@@ -119,24 +130,31 @@ class App extends Component {
     await contract.methods.getBack().send({ from: accounts[0] });
 
     // update state with stored value of wei
-    this.setState({ storageValueWei: await contract.methods.getContractBalance().call() });
-  }
+    this.setState({
+      storageValueWei: await contract.methods.getContractBalance().call()
+    });
+  };
 
   render() {
     return (
       <div>
-      <SiteHeader />
-      <Wrapper>
-        
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width={6}>
-              {
-                this.state.web3 ?
+        <SiteHeader />
+        <Wrapper>
+          <Grid>
+            <Grid.Row>
+              <Grid.Column>
+                <Lottery />
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Column>
+                {this.state.web3 ? (
                   <div>
                     <UserInformation
                       accountNr={this.state.activeAccount}
-                      accountBalance={this.weiToEther(this.state.activeAccountBalance)}
+                      accountBalance={this.weiToEther(
+                        this.state.activeAccountBalance
+                      )}
                       vaultBalance={this.weiToEther(this.state.storageValueWei)}
                     />
                     <ContractInteraction
@@ -144,19 +162,17 @@ class App extends Component {
                       getMoneyFromVault={this.getMoneyBack}
                     />
                   </div>
-                  :
-                  <Loading message={"Loading Web3, accounts, and contract..."}/>
-              }
-            </Grid.Column>
-            <Grid.Column width={10}>
-              <Lottery />
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </Wrapper>
+                ) : (
+                  <Loading
+                    message={"Loading Web3, accounts, and contract..."}
+                  />
+                )}
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </Wrapper>
       </div>
-    )
-
+    );
   }
 }
 
