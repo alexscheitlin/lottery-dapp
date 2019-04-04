@@ -1,30 +1,27 @@
 import React, { Component } from "react";
-import SimpleStorageContract from "./contracts/SimpleStorage.json";
+import LotteryMockContract from "./contracts/LotteryMock.json";
 import getWeb3 from "./utils/getWeb3";
 
 import Wrapper from "./Components/Wrapper";
 import Loading from "./Components/Loading";
 import SiteHeader from "./Components/SiteHeader";
 
-import UserInformation from "./Components/UserInformation";
-import ContractInteraction from "./Components/ContractInteraction";
+import Dashboard from "./Components/Dashboard/Dashboard";
+import Tickets from "./Components/Tickets/Tickets";
+import Game from "./Components/Game";
 
-import Lottery from "./Components/Lottery/Lottery";
-
-import { Grid } from "semantic-ui-react";
+import { Grid, Segment } from "semantic-ui-react";
 
 import "semantic-ui-css/semantic.min.css";
 
-import "./App.css";
-
 class App extends Component {
   state = {
-    storageValueWei: 0,
     web3: null,
     accounts: null,
     contract: null,
     activeAccount: null,
-    activeAccountBalance: -1
+    activeAccountBalance: -1,
+    tickets: null
   };
 
   etherToWei = value => value * 1000000000000000000;
@@ -44,24 +41,21 @@ class App extends Component {
 
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
-      const deployedNetwork = SimpleStorageContract.networks[networkId];
+      const deployedNetwork = LotteryMockContract.networks[networkId];
       const instance = new web3.eth.Contract(
-        SimpleStorageContract.abi,
+        LotteryMockContract.abi,
         deployedNetwork && deployedNetwork.address
       );
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState(
-        {
-          web3,
-          accounts,
-          contract: instance,
-          activeAccount,
-          activeAccountBalance
-        },
-        this.init
-      );
+      this.setState({
+        web3,
+        accounts,
+        contract: instance,
+        activeAccount,
+        activeAccountBalance
+      });
     } catch (error) {
       // Catch any errors for any of the above operations.
       console.error(error);
@@ -70,14 +64,34 @@ class App extends Component {
       );
     }
 
-    // check every second whether the account was changed in metamask or not
+    // check for changes of the data in the blockhain
     setInterval(() => {
-      this.checkForAccountChange();
+      this.checkForChanges();
     }, 2000);
   };
 
-  checkForAccountChange = async () => {
+  buyTicketClickHandler = async number => {
+    const { contract, accounts } = this.state;
+    if (this.isNumber(number) && this.isValid(number)) {
+      await contract.methods
+        .buyTicket(number)
+        .send({ from: accounts[0], value: this.etherToWei(1) });
+      this.getMyTickets();
+    } else {
+      alert("Must be a number between 1 and 5!");
+    }
+  };
+
+  getMyTickets = async () => {
+    const { contract } = this.state;
+    const tickets = await contract.methods.getMyTickets().call();
+    this.setState({ tickets: tickets });
+  };
+
+  checkForChanges = async () => {
     const { web3, accounts, activeAccount, activeAccountBalance } = this.state;
+
+    this.getMyTickets();
 
     const newAccounts = await web3.eth.getAccounts();
     if (accounts !== newAccounts) {
@@ -95,39 +109,15 @@ class App extends Component {
     }
   };
 
-  init = async () => {
-    const { contract } = this.state;
-
-    // get the account balance from of the smart contract
-    const response = await contract.methods.getContractBalance().call();
-
-    // update state with the result
-    this.setState({ storageValueWei: response });
+  isNumber = inputToCheck => {
+    return !isNaN(inputToCheck);
   };
 
-  sendMoney = async () => {
-    const { accounts, contract } = this.state;
-
-    // send a given value of wei to the smart contract
-    const value = this.etherToWei(1);
-    await contract.methods.sendWei().send({ from: accounts[0], value: value });
-
-    // update state with stored value of wei
-    this.setState({
-      storageValueWei: await contract.methods.getContractBalance().call()
-    });
-  };
-
-  getMoneyBack = async () => {
-    const { accounts, contract } = this.state;
-
-    // get the whole account balance of the smart contract
-    await contract.methods.getBack().send({ from: accounts[0] });
-
-    // update state with stored value of wei
-    this.setState({
-      storageValueWei: await contract.methods.getContractBalance().call()
-    });
+  isValid = inputToCheck => {
+    if (!this.isNumber(inputToCheck)) {
+      return false;
+    }
+    return inputToCheck > 0 && inputToCheck < 6;
   };
 
   render() {
@@ -136,27 +126,32 @@ class App extends Component {
         <SiteHeader />
         <Wrapper>
           <Grid>
-            <Grid.Row>
-              <Grid.Column>
-                {this.state.web3 ? (
-                  <Lottery activeAccount={this.state} />
-                ) : null}
-              </Grid.Column>
-            </Grid.Row>
+          <Grid.Row>
+              <Grid.Column width={8}>
+              <div style={{ textAlign: "center", margin: "1rem" }}>
+            <Segment>
+              <strong>Account: </strong>
+              {this.state.activeAccount}
+            </Segment>
+          </div>
+              </Grid.Column> 
+              <Grid.Column width={8}>
+              <div style={{ textAlign: "center", margin: "1rem" }}>
+            <Segment>              
+              Your account has <strong>{this.weiToEther(this.state.activeAccountBalance)}</strong>  ETH 
+            </Segment>
+          </div>
+                </Grid.Column> 
+              </Grid.Row>
             <Grid.Row>
               <Grid.Column>
                 {this.state.web3 ? (
                   <div>
-                    <UserInformation
-                      accountNr={this.state.activeAccount}
-                      accountBalance={this.weiToEther(
-                        this.state.activeAccountBalance
-                      )}
-                      vaultBalance={this.weiToEther(this.state.storageValueWei)}
-                    />
-                    <ContractInteraction
-                      sendMoneyToVault={this.sendMoney}
-                      getMoneyFromVault={this.getMoneyBack}
+                    <Dashboard />
+                    <Game buyTicket={this.buyTicketClickHandler} />
+                    <Tickets
+                      getTickets={this.getMyTicketsHandler}
+                      tickets={this.state.tickets}
                     />
                   </div>
                 ) : (

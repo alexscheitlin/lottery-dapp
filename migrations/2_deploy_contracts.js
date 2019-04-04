@@ -1,7 +1,5 @@
-var SimpleStorage = artifacts.require("./SimpleStorage.sol");
-var RandomNumberOracle = artifacts.require("./RandomNumberOracle.sol");
+var LotteryMock = artifacts.require("./LotteryMock.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(SimpleStorage);
-  deployer.deploy(RandomNumberOracle);
+  deployer.deploy(LotteryMock);
 };
