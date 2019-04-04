@@ -21,7 +21,8 @@ class App extends Component {
     contract: null,
     activeAccount: null,
     activeAccountBalance: -1,
-    tickets: null
+    tickets: null,
+    jackpot: null
   };
 
   etherToWei = value => value * 1000000000000000000;
@@ -76,7 +77,7 @@ class App extends Component {
       await contract.methods
         .buyTicket(number)
         .send({ from: accounts[0], value: this.etherToWei(1) });
-      this.getMyTickets();
+      this.updateTickets();
     } else {
       alert("Must be a number between 1 and 5!");
     }
@@ -89,16 +90,23 @@ class App extends Component {
       .send({ from: accounts[0] });
   };
 
-  getMyTickets = async () => {
+  updateTickets = async () => {
     const { contract } = this.state;
     const tickets = await contract.methods.getMyTickets().call();
     this.setState({ tickets: tickets });
   };
 
+  updateJackpot = async () => {
+    const { contract } = this.state;
+    const jackpot = await contract.methods.getJackpot().call();
+    this.setState({ jackpot: this.weiToEther(jackpot) });
+  }
+
   checkForChanges = async () => {
     const { web3, accounts, activeAccount, activeAccountBalance } = this.state;
 
-    this.getMyTickets();
+    this.updateTickets();
+    this.updateJackpot();
 
     const newAccounts = await web3.eth.getAccounts();
     if (accounts !== newAccounts) {
@@ -154,13 +162,14 @@ class App extends Component {
               <Grid.Column>
                 {this.state.web3 ? (
                   <div>
-                    <Dashboard />
+                    <Dashboard 
+                    jackpot={this.state.jackpot}
+                    />
                     <Game
                       buyTicket={this.buyTicketClickHandler}
                       endGame={this.endGameClickHandler}
                     />
                     <Tickets
-                      getTickets={this.getMyTicketsHandler}
                       tickets={this.state.tickets}
                     />
                   </div>
