@@ -2,6 +2,15 @@ import React, { Component } from "react";
 import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import getWeb3 from "./utils/getWeb3";
 
+import Wrapper from './Components/Wrapper';
+import UserInformation from './Components/UserInformation';
+import ContractInteraction from './Components/ContractInteraction';
+import Loading from './Components/Loading';
+
+import { Grid } from 'semantic-ui-react';
+
+import 'semantic-ui-css/semantic.min.css';
+
 import "./App.css";
 
 class App extends Component {
@@ -19,7 +28,7 @@ class App extends Component {
   }
 
   weiToEther = (value) => {
-    return Math.round(value / 1000000000000000000 * 100)/100;
+    return Math.round(value / 1000000000000000000 * 100) / 100;
   }
 
   componentDidMount = async () => {
@@ -44,7 +53,7 @@ class App extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance, activeAccount,  activeAccountBalance }, this.init);
+      this.setState({ web3, accounts, contract: instance, activeAccount, activeAccountBalance }, this.init);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -54,7 +63,7 @@ class App extends Component {
     }
 
     // check every second whether the account was changed in metamask or not
-    setInterval(() =>   {
+    setInterval(() => {
       this.checkForAccountChange();
     }, 1000);
   };
@@ -110,29 +119,35 @@ class App extends Component {
   }
 
   render() {
-    if (!this.state.web3) {
-      return <div>Loading Web3, accounts, and contract...</div>;
-    }
     return (
-      <div className="App">
-        <h1>Good to Go!</h1>
-        <p>Your Truffle Box is installed and ready.</p>
-        <h2>Smart Contract Example</h2>
-        <p>
-          If your contracts compiled and migrated successfully, below will show
-          a stored value of 1 (by default).
-        </p>
-        <p>
-          Try changing the value stored on <strong>line 55</strong> of App.js.
-        </p>
-        <div>Your Account: {this.state.activeAccount}</div>
-        <div>Your Balance: {this.weiToEther(this.state.activeAccountBalance)} Ether</div>
-        <div>The stored value is: {this.weiToEther(this.state.storageValueWei)} Ether</div>
+      <Wrapper>
+        <Grid>
+          <Grid.Row>
+            <Grid.Column width={6}>
+              {
+                this.state.web3 ?
+                  <div>
+                    <UserInformation
+                      accountNr={this.state.activeAccount}
+                      accountBalance={this.weiToEther(this.state.activeAccountBalance)}
+                      vaultBalance={this.weiToEther(this.state.storageValueWei)}
+                    />
+                    <ContractInteraction
+                      sendMoneyToVault={this.sendMoney}
+                      getMoneyFromVault={this.getMoneyBack}
+                    />
+                  </div>
+                  :
+                  <Loading message={"Loading Web3, accounts, and contract..."}/>
+              }
+            </Grid.Column>
+            <Grid.Column width={10}>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </Wrapper>
+    )
 
-        <div><button onClick={this.sendMoney}>Hit Me To Send Money</button></div>
-        <div><button onClick={this.getMoneyBack}>Hit Me To Get Your Money Back</button></div>
-      </div>
-    );
   }
 }
 
