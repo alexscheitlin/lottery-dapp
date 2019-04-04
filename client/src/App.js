@@ -2,13 +2,13 @@ import React, { Component } from "react";
 import LotteryMockContract from "./contracts/LotteryMock.json";
 import getWeb3 from "./utils/getWeb3";
 
-import Wrapper from "./Components/Wrapper";
-import Loading from "./Components/Loading";
-import SiteHeader from "./Components/SiteHeader";
+import Wrapper from "./Components/shared/Wrapper";
+import Loading from "./Components/shared/Loading";
+import SiteHeader from "./Components/shared/SiteHeader";
 
 import Dashboard from "./Components/Dashboard/Dashboard";
 import Tickets from "./Components/Tickets/Tickets";
-import Game from "./Components/Game";
+import Game from "./Components/Game/Game";
 
 import { Grid, Segment } from "semantic-ui-react";
 
