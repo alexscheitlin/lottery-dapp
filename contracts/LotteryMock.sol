@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 contract LotteryMock {
     
-    uint constant GAME_LENGTH = 5;          // number of blocks
+    uint constant GAME_LENGTH = 3;          // number of blocks
     uint constant TICKET_PRICE = 1 ether;
     uint constant MIN_NUMBER = 1;
     uint constant MAX_NUMBER = 5;
@@ -10,7 +10,18 @@ contract LotteryMock {
     struct Game {
         uint startBlock;
         uint endBlock;
-        mapping (address => uint[]) tickets;
+        uint luckyNumber;
+        mapping (uint => Participant) participants;
+        mapping (uint => address payable) winners;
+        
+        // keep track of number of participants and winners to iterate
+        uint numberOfParticipants;
+        uint numberOfWinners;
+    }
+    
+    struct Participant {
+        address payable addr;
+        uint[] numbers;
     }
     
     mapping (uint => Game) finishedGames;
@@ -39,12 +50,71 @@ contract LotteryMock {
         require(this.isGameOngoing());
         
         // record the sender's address and the received number
-        currentGame.tickets[msg.sender].push(number);
+        bool foundParticipant = false;
+        for (uint i=0; i<currentGame.numberOfParticipants; i++) {
+            // add number to existing participant
+            if (currentGame.participants[i].addr == msg.sender) {
+                currentGame.participants[i].numbers.push(number);
+                foundParticipant = true;
+                break;
+            }
+        }
+        
+        if (!foundParticipant) {
+            // create new participant
+            uint[] memory numbers = new uint[](1);
+            numbers[0] = number;
+            
+            Participant memory p = Participant({
+                addr: msg.sender,
+                numbers: numbers
+            });
+            
+            currentGame.participants[currentGame.numberOfParticipants++] = p;
+        }
     }
     
-    // returns the numbers in the current game associated with the sender's address
+    function endGame() public {
+        // verify that game has ended
+        require(this.hasGameEnded());
+        
+        // TODO: draw lucky number via oracle SC
+        uint drawnNumber = 1;
+        
+        // determine winners
+        for (uint i=0; i<currentGame.numberOfParticipants; i++) {
+            for (uint j=0; i<currentGame.participants[i].numbers.length; j++) {
+                if (currentGame.participants[i].numbers[j] == drawnNumber) {
+                    currentGame.winners[currentGame.numberOfWinners++] = currentGame.participants[i].addr;
+                    break;
+                }
+            }
+        }
+        
+        // TODO: refund caller
+        
+        // payout winners
+        for (uint i=0; i<currentGame.numberOfWinners; i++) {
+            currentGame.winners[i].transfer(address(this).balance / currentGame.numberOfWinners);
+        }
+        
+        // TODO: archive game
+        
+        // start new game
+        //currentGame = createNewGame(GAME_LENGTH);
+    }
+    
+    // returns the tickets (= numbers) in the current game associated with the sender's address
     function getMyTickets() public view returns(uint[] memory) {
-        return currentGame.tickets[msg.sender];
+        uint[] memory numbers;
+            
+        for (uint i=0; i<currentGame.numberOfParticipants; i++) {
+            if (currentGame.participants[i].addr == msg.sender) {
+                numbers = currentGame.participants[i].numbers;
+                break;
+            }
+        }
+        return numbers;
     }
 
     // return the smart contract's account balance
@@ -75,7 +145,10 @@ contract LotteryMock {
     function createNewGame(uint gameLength) private view returns(Game memory) {
         Game memory newGame = Game({
             startBlock: block.number,
-            endBlock: block.number + gameLength
+            endBlock: block.number + gameLength,
+            luckyNumber: 0,
+            numberOfParticipants: 0,
+            numberOfWinners: 0
         });
         
         return newGame;

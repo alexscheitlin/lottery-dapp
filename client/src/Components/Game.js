@@ -29,6 +29,10 @@ class Game extends Component {
     this.props.buyTicket(ticketNumber);
   };
 
+  endGame = () => {
+    this.props.endGame();
+  };
+
   render() {
     return (
       <Segment textAlign='center'>
@@ -41,6 +45,7 @@ class Game extends Component {
           onClick={this.numberClickHandler}
           />
         <Button secondary onClick={this.buyTicket}>Buy Ticket</Button>
+        <Button secondary onClick={this.endGame}>End Game</Button>
       </Segment>
     );
   }

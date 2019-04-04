@@ -82,6 +82,13 @@ class App extends Component {
     }
   };
 
+  endGameClickHandler = async () => {
+    const { contract, accounts } = this.state;
+    await contract.methods
+      .endGame()
+      .send({ from: accounts[0] });
+  };
+
   getMyTickets = async () => {
     const { contract } = this.state;
     const tickets = await contract.methods.getMyTickets().call();
@@ -148,7 +155,10 @@ class App extends Component {
                 {this.state.web3 ? (
                   <div>
                     <Dashboard />
-                    <Game buyTicket={this.buyTicketClickHandler} />
+                    <Game
+                      buyTicket={this.buyTicketClickHandler}
+                      endGame={this.endGameClickHandler}
+                    />
                     <Tickets
                       getTickets={this.getMyTicketsHandler}
                       tickets={this.state.tickets}
