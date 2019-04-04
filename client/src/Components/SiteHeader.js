@@ -11,7 +11,7 @@ const headerStyle = {
 const siteHeader = () => (
   <Container fluid>
     <Header as="h1" textAlign="center" style={headerStyle} icon>
-      <Icon name="gem" />
+      <Icon inverted name="gem" />
       Lottery dApp
       <Header.Subheader>lose your money and make us rich</Header.Subheader>
     </Header>
