@@ -3,9 +3,12 @@ import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import getWeb3 from "./utils/getWeb3";
 
 import Wrapper from './Components/Wrapper';
+import Loading from './Components/Loading';
+
 import UserInformation from './Components/UserInformation';
 import ContractInteraction from './Components/ContractInteraction';
-import Loading from './Components/Loading';
+
+import Lottery from './Components/Lottery/Lottery';
 
 import { Grid } from 'semantic-ui-react';
 
@@ -142,6 +145,7 @@ class App extends Component {
               }
             </Grid.Column>
             <Grid.Column width={10}>
+              <Lottery />
             </Grid.Column>
           </Grid.Row>
         </Grid>
