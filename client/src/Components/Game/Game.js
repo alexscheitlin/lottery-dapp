@@ -36,9 +36,6 @@ class Game extends Component {
   render() {
     return (
       <Segment textAlign='center'>
-      <Header>
-        Select a Ticket to buy
-      </Header>
         <NumberGrid 
           numbers={this.state.numberGrid} 
           activeNumber={this.state.pressedNumber}
