@@ -22,7 +22,9 @@ class App extends Component {
     activeAccount: null,
     activeAccountBalance: -1,
     tickets: null,
-    jackpot: null
+    jackpot: null,
+    currentBlock: null,
+    drawBlock: 250
   };
 
   etherToWei = value => value * 1000000000000000000;
@@ -102,11 +104,20 @@ class App extends Component {
     this.setState({ jackpot: this.weiToEther(jackpot) });
   }
 
+  updateCurrentBlock = async () => {
+    const { web3 } = this.state;
+    const currentBlock = await web3.eth.getBlockNumber();
+    this.setState({
+      currentBlock: currentBlock
+    });
+  }
+
   checkForChanges = async () => {
     const { web3, accounts, activeAccount, activeAccountBalance } = this.state;
 
     this.updateTickets();
     this.updateJackpot();
+    this.updateCurrentBlock();
 
     const newAccounts = await web3.eth.getAccounts();
     if (accounts !== newAccounts) {
@@ -164,6 +175,8 @@ class App extends Component {
                   <div>
                     <Dashboard 
                     jackpot={this.state.jackpot}
+                    currentBlock={this.state.currentBlock}
+                    drawBlock={this.state.drawBlock}
                     />
                     <Game
                       buyTicket={this.buyTicketClickHandler}

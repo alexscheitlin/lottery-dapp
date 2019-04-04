@@ -10,11 +10,11 @@ const dashboard = (props) => (
   <Segment>
     <Grid columns={3}>
       <Grid.Row>
-        <Grid.Column>
-        <Drawing />
+        <Grid.Column verticalAlign='middle' textAlign='center'>
+          <Drawing currentBlock={props.currentBlock} drawBlock={props.drawBlock} />
         </Grid.Column>
         <Grid.Column textAlign='center'>
-          <Jackpot jackpot={props.jackpot}/>
+          <Jackpot jackpot={props.jackpot} />
         </Grid.Column>
         <Grid.Column>
           <Winnings />
