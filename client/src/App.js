@@ -27,13 +27,8 @@ class App extends Component {
     activeAccountBalance: -1
   };
 
-  etherToWei = value => {
-    return value * 1000000000000000000;
-  };
-
-  weiToEther = value => {
-    return Math.round((value / 1000000000000000000) * 100) / 100;
-  };
+  etherToWei = value => value * 1000000000000000000;
+  weiToEther = value => Math.round((value / 1000000000000000000) * 100) / 100;
 
   componentDidMount = async () => {
     try {
@@ -69,10 +64,10 @@ class App extends Component {
       );
     } catch (error) {
       // Catch any errors for any of the above operations.
+      console.error(error);
       alert(
         "Failed to load web3, accounts, or contract. Check console for details."
       );
-      console.error(error);
     }
 
     // check every second whether the account was changed in metamask or not
@@ -143,14 +138,9 @@ class App extends Component {
           <Grid>
             <Grid.Row>
               <Grid.Column>
-                {
-                  this.state.web3 ?
-                  <Lottery 
-                    activeAccount={this.state}
-                  /> :
-                  null
-                }
-                
+                {this.state.web3 ? (
+                  <Lottery activeAccount={this.state} />
+                ) : null}
               </Grid.Column>
             </Grid.Row>
             <Grid.Row>
