@@ -3,6 +3,7 @@ import React from 'react'
 import Jackpot from './Jackpot';
 import Drawing from './Drawing';
 import Winnings from './Winnings';
+import Status from './Status';
 
 import { Segment, Grid } from 'semantic-ui-react';
 
@@ -13,10 +14,11 @@ const dashboard = (props) => (
         <Grid.Column verticalAlign='middle' textAlign='center'>
           <Drawing currentBlock={props.currentBlock} drawBlock={props.drawBlock} />
         </Grid.Column>
-        <Grid.Column textAlign='center'>
+        <Grid.Column verticalAlign='middle' textAlign='center'>
           <Jackpot jackpot={props.jackpot} />
         </Grid.Column>
         <Grid.Column>
+          <Status />
           <Winnings />
         </Grid.Column>
       </Grid.Row>

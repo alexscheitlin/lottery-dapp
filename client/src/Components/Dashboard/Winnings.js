@@ -1,7 +1,9 @@
 import React from 'react'
 
+import {Segment} from 'semantic-ui-react';
+
 const winnings = (props) => (
-  <div>display last few winners here, including the sum</div>
+  <Segment>display last few winners here, including the sum</Segment>
 )
 
 export default winnings;
