@@ -94,20 +94,17 @@ class App extends Component {
       .send({ from: accounts[0] });
   };
 
-  updateTickets = async () => {
-    const { contract } = this.state;
+  updateTickets = async (contract) => {
     const tickets = await contract.methods.getMyTickets().call();
     this.setState({ tickets: tickets });
   };
 
-  updateJackpot = async () => {
-    const { contract } = this.state;
+  updateJackpot = async (contract) => {
     const jackpot = await contract.methods.getJackpot().call();
     this.setState({ jackpot: this.weiToEther(jackpot) });
   }
 
-  updateCurrentBlock = async () => {
-    const { web3 } = this.state;
+  updateCurrentBlock = async (web3) => {
     const currentBlock = await web3.eth.getBlockNumber();
     this.setState({
       currentBlock: currentBlock
@@ -131,9 +128,9 @@ class App extends Component {
   checkForChanges = async () => {
     const { web3, contract, accounts, activeAccount, activeAccountBalance } = this.state;
 
-    this.updateTickets();
-    this.updateJackpot();
-    this.updateCurrentBlock();
+    this.updateTickets(contract);
+    this.updateJackpot(contract);
+    this.updateCurrentBlock(web3);
     this.updateMinNumber(contract);
     this.updateMaxNumber(contract);
 
