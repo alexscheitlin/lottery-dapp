@@ -81,7 +81,7 @@ class App extends Component {
       await contract.methods
         .buyTicket(number)
         .send({ from: accounts[0], value: this.etherToWei(1) });
-      this.updateTickets();
+      this.updateTickets(contract);
     } else {
       alert("Must be a number between 1 and 5!");
     }
