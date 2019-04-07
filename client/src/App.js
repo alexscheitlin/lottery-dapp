@@ -24,7 +24,9 @@ class App extends Component {
     tickets: null,
     jackpot: null,
     currentBlock: null,
-    drawBlock: 250
+    drawBlock: 250,
+    minNumber: -1,
+    maxNumber: -1,
   };
 
   etherToWei = value => value * 1000000000000000000;
@@ -112,12 +114,28 @@ class App extends Component {
     });
   }
 
+  updateMinNumber = async (contract) => {
+    const minNumber = await contract.methods.getMinNumber().call();
+    this.setState({
+      minNumber: parseInt(minNumber, 10)
+    });
+  }
+
+  updateMaxNumber = async (contract) => {
+    const maxNumber = await contract.methods.getMaxNumber().call();
+    this.setState({
+      maxNumber: parseInt(maxNumber, 10)
+    });
+  }
+
   checkForChanges = async () => {
-    const { web3, accounts, activeAccount, activeAccountBalance } = this.state;
+    const { web3, contract, accounts, activeAccount, activeAccountBalance } = this.state;
 
     this.updateTickets();
     this.updateJackpot();
     this.updateCurrentBlock();
+    this.updateMinNumber(contract);
+    this.updateMaxNumber(contract);
 
     const newAccounts = await web3.eth.getAccounts();
     if (accounts !== newAccounts) {
@@ -179,6 +197,8 @@ class App extends Component {
                     drawBlock={this.state.drawBlock}
                     />
                     <Game
+                      minNumber={this.state.minNumber}
+                      maxNumber={this.state.maxNumber}
                       buyTicket={this.buyTicketClickHandler}
                       endGame={this.endGameClickHandler}
                     />

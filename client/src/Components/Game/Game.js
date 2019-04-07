@@ -6,9 +6,6 @@ import { Segment, Header, Input, Button } from "semantic-ui-react";
 
 class Game extends Component {
   state = {
-    numberGrid: [
-      1, 2, 3, 4, 5
-    ],
     pressedNumber: -1
   };
 
@@ -37,7 +34,8 @@ class Game extends Component {
     return (
       <Segment textAlign='center'>
         <NumberGrid 
-          numbers={this.state.numberGrid} 
+          minNumber={this.props.minNumber}
+          maxNumber={this.props.maxNumber}
           activeNumber={this.state.pressedNumber}
           onClick={this.numberClickHandler}
           />

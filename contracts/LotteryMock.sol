@@ -137,6 +137,16 @@ contract LotteryMock {
         return this.hasGameStarted() && !this.hasGameEnded();
     }
     
+    // returns minimum required number to buy a ticket (inclusive)
+    function getMinNumber() public pure returns(uint) {
+        return MIN_NUMBER;
+    }
+    
+    // returns maximum allowed number to buy a ticket (inclusive)
+    function getMaxNumber() public pure returns(uint) {
+        return MAX_NUMBER;
+    }
+    
     
     // /////////////////////////////////////////////////////////////////
     // private functions
