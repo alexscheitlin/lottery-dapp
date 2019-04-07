@@ -24,10 +24,11 @@ contract LotteryMock {
         uint[] numbers;
     }
     
-    mapping (uint => Game) finishedGames;
-    
     Game public currentGame;
     
+    mapping (uint => Game) public finishedGames;
+    uint numberOfGames = 0;
+
     constructor() public {
         currentGame = createNewGame(GAME_LENGTH);
     }
@@ -80,6 +81,7 @@ contract LotteryMock {
         
         // TODO: draw lucky number via oracle SC
         uint drawnNumber = 1;
+        currentGame.luckyNumber = drawnNumber;
         
         // determine winners
         for (uint i=0; i<currentGame.numberOfParticipants; i++) {
@@ -98,10 +100,11 @@ contract LotteryMock {
             currentGame.winners[i].transfer(address(this).balance / currentGame.numberOfWinners);
         }
         
-        // TODO: archive game
+        // archive game
+        finishedGames[numberOfGames++] = currentGame;
         
         // start new game
-        //currentGame = createNewGame(GAME_LENGTH);
+        currentGame = createNewGame(GAME_LENGTH);
     }
     
     // returns the tickets (= numbers) in the current game associated with the sender's address
@@ -147,6 +150,9 @@ contract LotteryMock {
         return MAX_NUMBER;
     }
     
+    function getNumberOfFinishedGames() public view returns(uint) {
+        return numberOfGames;
+    }
     
     // /////////////////////////////////////////////////////////////////
     // private functions
