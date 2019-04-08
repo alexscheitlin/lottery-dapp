@@ -82,10 +82,12 @@ class App extends Component {
       await contract.methods
         .buyTicket(number)
         .send({ from: accounts[0], value: this.etherToWei(1) });
-      this.updateTickets(contract);
     } else {
       alert("Must be a number between 1 and 5!");
+      return;
     }
+
+    this.checkForChanges();
   };
 
   endGameClickHandler = async () => {
@@ -98,7 +100,10 @@ class App extends Component {
         .send({ from: accounts[0] });
     } else {
       alert("Game is still running!");
+      return;
     }
+
+    this.checkForChanges();
   };
 
   updateTickets = async (contract) => {
