@@ -85,7 +85,7 @@ contract LotteryMock {
         
         // determine winners
         for (uint i=0; i<currentGame.numberOfParticipants; i++) {
-            for (uint j=0; i<currentGame.participants[i].numbers.length; j++) {
+            for (uint j=0; j<currentGame.participants[i].numbers.length; j++) {
                 if (currentGame.participants[i].numbers[j] == drawnNumber) {
                     currentGame.winners[currentGame.numberOfWinners++] = currentGame.participants[i].addr;
                     break;
