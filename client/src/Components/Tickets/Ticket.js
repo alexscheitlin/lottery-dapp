@@ -22,7 +22,7 @@ const ticket = (props) => {
     
       <Card.Content textAlign='center'>
       <span style={indexStyle}># {props.index}</span>
-        <Label circular style={labelStyle} size='massive'>{props.index}</Label>
+        <Label circular style={labelStyle} size='massive'>{props.number}</Label>
       </Card.Content>
     </Card>
   )
