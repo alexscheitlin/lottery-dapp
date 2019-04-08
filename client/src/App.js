@@ -78,14 +78,21 @@ class App extends Component {
 
   buyTicketClickHandler = async number => {
     const { contract, accounts } = this.state;
-    if (this.isNumber(number) && this.isValid(number)) {
-      await contract.methods
-        .buyTicket(number)
-        .send({ from: accounts[0], value: this.etherToWei(1) });
-    } else {
+    const hasGameEnded = await contract.methods.hasGameEnded().call();
+
+    if (hasGameEnded) {
+      alert("Game has ended!");
+      return;
+    }
+
+    if (!this.isNumber(number) || !this.isValid(number)) {
       alert("Must be a number between 1 and 5!");
       return;
     }
+
+    await contract.methods
+      .buyTicket(number)
+      .send({ from: accounts[0], value: this.etherToWei(1) });
 
     this.checkForChanges();
   };
@@ -94,14 +101,14 @@ class App extends Component {
     const { contract, accounts } = this.state;
     const hasGameEnded = await contract.methods.hasGameEnded().call();
 
-    if (hasGameEnded) {
-      await contract.methods
-        .endGame()
-        .send({ from: accounts[0] });
-    } else {
-      alert("Game is still running!");
-      return;
+    if (!hasGameEnded) {
+        alert("Game is still running!");
+        return;
     }
+
+    await contract.methods
+      .endGame()
+      .send({ from: accounts[0] });
 
     this.checkForChanges();
   };
