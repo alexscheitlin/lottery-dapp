@@ -90,9 +90,15 @@ class App extends Component {
 
   endGameClickHandler = async () => {
     const { contract, accounts } = this.state;
-    await contract.methods
-      .endGame()
-      .send({ from: accounts[0] });
+    const hasGameEnded = await contract.methods.hasGameEnded().call();
+
+    if (hasGameEnded) {
+      await contract.methods
+        .endGame()
+        .send({ from: accounts[0] });
+    } else {
+      alert("Game is still running!");
+    }
   };
 
   updateTickets = async (contract) => {
