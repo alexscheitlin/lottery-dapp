@@ -7,7 +7,7 @@ import {Label} from 'semantic-ui-react';
 
 
 const getArrayFromTo = (from, to) => {
-  if (from < 0 || to < 0) {
+  if (isNaN(from) || from < 0 || isNaN(to) || to < 0) {
     return [];
   }
 

@@ -24,7 +24,8 @@ class App extends Component {
     tickets: null,
     jackpot: null,
     currentBlock: null,
-    drawBlock: 250,
+    startBock: null,
+    endBlock: null,
     minNumber: -1,
     maxNumber: -1,
   };
@@ -125,6 +126,15 @@ class App extends Component {
     });
   }
 
+  updateGameBlocks = async (contract) => {
+    const startBlock = await contract.methods.getStartBlockOfCurrentGame().call();
+    const endBlock = await contract.methods.getEndBlockOfCurrentGame().call();
+    this.setState({
+      startBlock: parseInt(startBlock, 10),
+      endBlock: parseInt(endBlock, 10)
+    });
+  }
+
   checkForChanges = async () => {
     const { web3, contract, accounts, activeAccount, activeAccountBalance } = this.state;
 
@@ -133,6 +143,7 @@ class App extends Component {
     this.updateCurrentBlock(web3);
     this.updateMinNumber(contract);
     this.updateMaxNumber(contract);
+    this.updateGameBlocks(contract);
 
     const newAccounts = await web3.eth.getAccounts();
     if (accounts !== newAccounts) {
@@ -189,9 +200,10 @@ class App extends Component {
                 {this.state.web3 ? (
                   <div>
                     <Dashboard 
-                    jackpot={this.state.jackpot}
-                    currentBlock={this.state.currentBlock}
-                    drawBlock={this.state.drawBlock}
+                      jackpot={this.state.jackpot}
+                      startBlock={this.state.startBlock}
+                      currentBlock={this.state.currentBlock}
+                      endBlock={this.state.endBlock}
                     />
                     <Game
                       minNumber={this.state.minNumber}

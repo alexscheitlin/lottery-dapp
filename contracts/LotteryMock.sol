@@ -154,6 +154,14 @@ contract LotteryMock {
         return numberOfGames;
     }
     
+    function getStartBlockOfCurrentGame() public view returns(uint) {
+        return currentGame.startBlock;
+    }
+    
+    function getEndBlockOfCurrentGame() public view returns(uint) {
+        return currentGame.endBlock;
+    }
+    
     // /////////////////////////////////////////////////////////////////
     // private functions
     // /////////////////////////////////////////////////////////////////

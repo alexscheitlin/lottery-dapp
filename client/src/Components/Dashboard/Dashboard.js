@@ -12,7 +12,7 @@ const dashboard = (props) => (
     <Grid columns={3}>
       <Grid.Row>
         <Grid.Column verticalAlign='middle' textAlign='center'>
-          <Drawing currentBlock={props.currentBlock} drawBlock={props.drawBlock} />
+          <Drawing startBlock={props.startBlock} currentBlock={props.currentBlock} endBlock={props.endBlock} />
         </Grid.Column>
         <Grid.Column verticalAlign='middle' textAlign='center'>
           <Jackpot jackpot={props.jackpot} />
