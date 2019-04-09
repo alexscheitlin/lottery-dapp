@@ -18,7 +18,7 @@ truffle unbox react
 6. Pull and merge the latest changes from `origin/master` into your local branch
 7. Verify that your changes still work as expected
 8. Merge your branch into `master` and push the changes
-9. Move the issue to the _Done_ column of the _Lottery dApp_ project
+9. Close the issue and move it to the _Done_ column of the _Lottery dApp_ project
 
 ## Prerequisites
 
