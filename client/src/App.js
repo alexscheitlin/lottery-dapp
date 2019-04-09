@@ -16,65 +16,128 @@ import "semantic-ui-css/semantic.min.css";
 
 class App extends Component {
   state = {
-    web3: null,
     accounts: null,
-    contract: null,
     activeAccount: null,
     activeAccountBalance: -1,
-    tickets: null,
-    jackpot: null,
+    contract: null,
     currentBlock: null,
-    startBock: null,
     endBlock: null,
-    minNumber: -1,
+    jackpot: null,
+    startBock: null,
+    tickets: null,
     maxNumber: -1,
+    minNumber: -1,
+    web3: null,
   };
 
-  etherToWei = value => value * 1000000000000000000;
-  weiToEther = value => Math.round((value / 1000000000000000000) * 100) / 100;
+  /////////////////////////////////////////////////////////////////////////////
+  // initialize component state
+  /////////////////////////////////////////////////////////////////////////////
 
   componentDidMount = async () => {
     try {
-      // Get network provider and web3 instance.
+      // get network provider and web3 instance
       const web3 = await getWeb3();
 
-      // Use web3 to get the user's accounts.
-      const accounts = await web3.eth.getAccounts();
-
-      // Get the currently active account and its balance
-      const activeAccount = accounts[0];
-      const activeAccountBalance = await web3.eth.getBalance(activeAccount);
-
-      // Get the contract instance.
+      // get the contract instance
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = LotteryContract.networks[networkId];
-      const instance = new web3.eth.Contract(
+      const contract = new web3.eth.Contract(
         LotteryContract.abi,
         deployedNetwork && deployedNetwork.address
       );
 
-      // Set web3, accounts, and contract to the state, and then proceed with an
-      // example of interacting with the contract's methods.
+      // set web3 and contract to the state
       this.setState({
         web3,
-        accounts,
-        contract: instance,
-        activeAccount,
-        activeAccountBalance
+        contract
       });
+
+      // initially fetch data from the smart contract and store it in the state
+      this.fetchInitialData();
+      this.fetchData();
     } catch (error) {
-      // Catch any errors for any of the above operations.
+      // catch any errors for any of the above operations
       console.error(error);
       alert(
         "Failed to load web3, accounts, or contract. Check console for details."
       );
     }
 
-    // check for changes of the data in the blockhain
+    // periodically check for changes of the data in the blockhain
     setInterval(() => {
-      this.checkForChanges();
+      this.fetchData();
     }, 2000);
   };
+
+  /////////////////////////////////////////////////////////////////////////////
+  // fetch data
+  /////////////////////////////////////////////////////////////////////////////
+
+  fetchInitialData = async () => {
+    const { contract } = this.state;
+
+    // get minimum allowed number for tickets
+    const minNumber = await contract.methods.getMinNumber().call();
+    this.setState({
+      minNumber: parseInt(minNumber, 10)
+    });
+
+    // get maximum allowed number for tickets
+    const maxNumber = await contract.methods.getMaxNumber().call();
+    this.setState({
+      maxNumber: parseInt(maxNumber, 10)
+    });
+  }
+
+  fetchData = async () => {
+    const { contract, web3 } = this.state;
+
+    // fetch accounts from metamask
+    const accounts = await web3.eth.getAccounts();
+    this.setState({ accounts: accounts });
+
+    // get active account
+    const activeAccount = accounts[0];
+    this.setState({ activeAccount: activeAccount });
+
+    // fetch balance of active account
+    const activeAccountBalance = await web3.eth.getBalance(activeAccount);
+    this.setState({ activeAccountBalance: activeAccountBalance });
+
+    this.updateTickets(contract);
+    this.updateJackpot(contract);
+    this.updateCurrentBlock(web3);
+    this.updateGameBlocks(contract);
+  };
+
+  updateTickets = async (contract) => {
+    const tickets = await contract.methods.getMyTickets().call();
+    this.setState({ tickets: tickets });
+  };
+
+  updateJackpot = async (contract) => {
+    const jackpot = await contract.methods.getJackpot().call();
+    this.setState({ jackpot: this.weiToEther(jackpot) });
+  }
+
+  updateCurrentBlock = async (web3) => {
+    const currentBlock = await web3.eth.getBlockNumber();
+    this.setState({ currentBlock: currentBlock });
+  }
+
+  updateGameBlocks = async (contract) => {
+    const startBlock = await contract.methods.getStartBlockOfCurrentGame().call();
+    const endBlock = await contract.methods.getEndBlockOfCurrentGame().call();
+    this.setState({
+      startBlock: parseInt(startBlock, 10),
+      endBlock: parseInt(endBlock, 10)
+    });
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // click handlers
+  /////////////////////////////////////////////////////////////////////////////
 
   buyTicketClickHandler = async number => {
     const { contract, accounts } = this.state;
@@ -113,71 +176,12 @@ class App extends Component {
     this.checkForChanges();
   };
 
-  updateTickets = async (contract) => {
-    const tickets = await contract.methods.getMyTickets().call();
-    this.setState({ tickets: tickets });
-  };
+  /////////////////////////////////////////////////////////////////////////////
+  // utils
+  /////////////////////////////////////////////////////////////////////////////
 
-  updateJackpot = async (contract) => {
-    const jackpot = await contract.methods.getJackpot().call();
-    this.setState({ jackpot: this.weiToEther(jackpot) });
-  }
-
-  updateCurrentBlock = async (web3) => {
-    const currentBlock = await web3.eth.getBlockNumber();
-    this.setState({
-      currentBlock: currentBlock
-    });
-  }
-
-  updateMinNumber = async (contract) => {
-    const minNumber = await contract.methods.getMinNumber().call();
-    this.setState({
-      minNumber: parseInt(minNumber, 10)
-    });
-  }
-
-  updateMaxNumber = async (contract) => {
-    const maxNumber = await contract.methods.getMaxNumber().call();
-    this.setState({
-      maxNumber: parseInt(maxNumber, 10)
-    });
-  }
-
-  updateGameBlocks = async (contract) => {
-    const startBlock = await contract.methods.getStartBlockOfCurrentGame().call();
-    const endBlock = await contract.methods.getEndBlockOfCurrentGame().call();
-    this.setState({
-      startBlock: parseInt(startBlock, 10),
-      endBlock: parseInt(endBlock, 10)
-    });
-  }
-
-  checkForChanges = async () => {
-    const { web3, contract, accounts, activeAccount, activeAccountBalance } = this.state;
-
-    this.updateTickets(contract);
-    this.updateJackpot(contract);
-    this.updateCurrentBlock(web3);
-    this.updateMinNumber(contract);
-    this.updateMaxNumber(contract);
-    this.updateGameBlocks(contract);
-
-    const newAccounts = await web3.eth.getAccounts();
-    if (accounts !== newAccounts) {
-      this.setState({ accounts: newAccounts });
-    }
-
-    const newActiveAccount = newAccounts[0];
-    if (activeAccount !== newActiveAccount) {
-      this.setState({ activeAccount: newActiveAccount });
-    }
-
-    const newActiveAccountBalance = await web3.eth.getBalance(newActiveAccount);
-    if (activeAccountBalance !== newActiveAccountBalance) {
-      this.setState({ activeAccountBalance: newActiveAccountBalance });
-    }
-  };
+  etherToWei = value => value * 1000000000000000000;
+  weiToEther = value => Math.round((value / 1000000000000000000) * 100) / 100;
 
   isNumber = inputToCheck => {
     return !isNaN(inputToCheck);
@@ -190,6 +194,9 @@ class App extends Component {
     return inputToCheck > 0 && inputToCheck < 6;
   };
 
+  /////////////////////////////////////////////////////////////////////////////
+  // redner component
+  /////////////////////////////////////////////////////////////////////////////
   render() {
     return (
       <div>
