@@ -1,5 +1,5 @@
-var LotteryMock = artifacts.require("./LotteryMock.sol");
+var Lottery = artifacts.require("./Lottery.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(LotteryMock);
+  deployer.deploy(Lottery);
 };

@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-contract LotteryMock {
+contract Lottery {
     
     uint constant GAME_LENGTH = 3;          // number of blocks
     uint constant TICKET_PRICE = 1 ether;

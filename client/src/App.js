@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import LotteryMockContract from "./contracts/LotteryMock.json";
+import LotteryContract from "./contracts/Lottery.json";
 import getWeb3 from "./utils/getWeb3";
 
 import Wrapper from "./Components/shared/Wrapper";
@@ -47,9 +47,9 @@ class App extends Component {
 
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
-      const deployedNetwork = LotteryMockContract.networks[networkId];
+      const deployedNetwork = LotteryContract.networks[networkId];
       const instance = new web3.eth.Contract(
-        LotteryMockContract.abi,
+        LotteryContract.abi,
         deployedNetwork && deployedNetwork.address
       );
 
