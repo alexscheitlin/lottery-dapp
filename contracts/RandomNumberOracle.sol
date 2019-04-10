@@ -1,35 +1,23 @@
 pragma solidity ^0.5.0;
 
 contract RandomNumberOracle{
-    function getRandomNumber(uint blockNumber) public view returns(uint){
-        return (uint(blockhash(blockNumber)) % 42) + 1;
+    // @notice This function can be used to generate a random number based on the specific future blockhash
+    // @dev The miner of the defined block number has the possiblity to withhold a mined block in order to manipulate the randomness.
+    // @param min The lower boundary of the random range (min is part of the range)
+    // @param max The upper boundary of the random range (max is part of the range)
+    // @param blockNumber The block number which will is used to create the random numbers
+    // @return A random integer greater or equal to min and smaller or equal to max
+    function getRandomNumber(uint min, uint max, uint blockNumber) public view returns(uint){
+        require(block.number > blockNumber);
+        return (uint(blockhash(blockNumber)) % (max - min + 1)) + min;
     }
     
-    function getSixRandomNumbers(uint blockNumber) public view returns(uint[] memory _randomNumbers){
-        _randomNumbers = new uint[](6);
-        for(uint i = 0; i < 6; i++){
-            _randomNumbers[i] = (uint(blockhash(blockNumber-i)) % 42) + 1;
-        }
-        return _randomNumbers;
-    }
-}
-
-// This is just a dummy lottery SC to demonstrate how to interact with the Random Number Oracle
-contract Lottery{
-    RandomNumberOracle oracle;
-    uint randomNumber;
-    uint drawLotteryBlockNumber;
-    
-    constructor(address _oracleAddress) public{
-        oracle = RandomNumberOracle(_oracleAddress);
-        drawLotteryBlockNumber = block.number;
+    function a(uint blockNumber) public view returns(uint){
+        require(block.number > blockNumber);
+        return 1;
     }
     
-    function setRandomNumber() public{
-        randomNumber = oracle.getRandomNumber(drawLotteryBlockNumber);
-    }
-    
-    function getRandomNumber() public view returns(uint){
-        return randomNumber;
+    function b() public view returns(uint) {
+        return 1;
     }
 }

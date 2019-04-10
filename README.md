@@ -117,3 +117,5 @@ _everytime to run the environment_
    npm start
    ```
 6. `localhost:3000` should be opened automatically in your browser
+
+:warning: Make sure your Metamask is connected to the correct network! :warning:

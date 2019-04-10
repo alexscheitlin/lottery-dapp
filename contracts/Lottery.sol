@@ -1,15 +1,19 @@
 pragma solidity ^0.5.0;
 
+import "./RandomNumberOracle.sol";
+
 contract Lottery {
     
     uint constant GAME_LENGTH = 3;          // number of blocks
+    uint constant DRAW_PERIOD = 1;          // number of blocks
     uint constant TICKET_PRICE = 1 ether;
     uint constant MIN_NUMBER = 1;
-    uint constant MAX_NUMBER = 5;
+    uint constant MAX_NUMBER = 20;
     
     struct Game {
         uint startBlock;
         uint endBlock;
+        uint drawBlock;
         uint luckyNumber;
         mapping (uint => Participant) participants;
         mapping (uint => address payable) winners;
@@ -17,6 +21,8 @@ contract Lottery {
         // keep track of number of participants and winners to iterate
         uint numberOfParticipants;
         uint numberOfWinners;
+        
+        // TODO keep track of jackpot
     }
     
     struct Participant {
@@ -26,11 +32,14 @@ contract Lottery {
     
     Game public currentGame;
     
+    RandomNumberOracle oracle;
+    
     mapping (uint => Game) public finishedGames;
     uint numberOfGames = 0;
 
     constructor() public {
         currentGame = createNewGame(GAME_LENGTH);
+        oracle = new RandomNumberOracle();
     }
     
     // /////////////////////////////////////////////////////////////////
@@ -77,10 +86,10 @@ contract Lottery {
     
     function endGame() public {
         // verify that game has ended
-        require(this.hasGameEnded());
+        require(this.isNumberDrawable());
         
         // TODO: draw lucky number via oracle SC
-        uint drawnNumber = 1;
+        uint drawnNumber = oracle.getRandomNumber(MIN_NUMBER, MAX_NUMBER, currentGame.drawBlock);
         currentGame.luckyNumber = drawnNumber;
         
         // determine winners
@@ -140,6 +149,10 @@ contract Lottery {
         return this.hasGameStarted() && !this.hasGameEnded();
     }
     
+    function isNumberDrawable() public view returns(bool){
+        return block.number > currentGame.drawBlock;
+    }
+    
     // returns minimum required number to buy a ticket (inclusive)
     function getMinNumber() public pure returns(uint) {
         return MIN_NUMBER;
@@ -162,6 +175,17 @@ contract Lottery {
         return currentGame.endBlock;
     }
     
+    function getDrawBlockOfCurrentGame() public view returns(uint){
+        return currentGame.drawBlock;
+    }
+    
+    function getCurrentBlock() public view returns(uint){
+        return block.number;
+    }
+    
+    // This function is only used to force ganache to add a block and thus controll the speed of the blockchain manually
+    function skipBlock() public{}
+    
     // /////////////////////////////////////////////////////////////////
     // private functions
     // /////////////////////////////////////////////////////////////////
@@ -170,6 +194,7 @@ contract Lottery {
         Game memory newGame = Game({
             startBlock: block.number,
             endBlock: block.number + gameLength,
+            drawBlock: block.number + gameLength + DRAW_PERIOD,
             luckyNumber: 0,
             numberOfParticipants: 0,
             numberOfWinners: 0
