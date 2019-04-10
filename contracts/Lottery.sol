@@ -22,7 +22,8 @@ contract Lottery {
         uint numberOfParticipants;
         uint numberOfWinners;
         
-        // TODO keep track of jackpot
+        // keep track of jackpot
+        uint jackpot;
     }
     
     struct Participant {
@@ -103,6 +104,9 @@ contract Lottery {
         }
         
         // TODO: refund caller
+        
+        // keep track of jackpot
+        currentGame.jackpot = address(this).balance;
         
         // payout winners
         for (uint i=0; i<currentGame.numberOfWinners; i++) {
@@ -197,7 +201,8 @@ contract Lottery {
             drawBlock: block.number + gameLength + DRAW_PERIOD,
             luckyNumber: 0,
             numberOfParticipants: 0,
-            numberOfWinners: 0
+            numberOfWinners: 0,
+            jackpot:0
         });
         
         return newGame;
