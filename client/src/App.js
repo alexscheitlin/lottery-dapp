@@ -10,7 +10,7 @@ import Dashboard from "./Components/Dashboard/Dashboard";
 import Tickets from "./Components/Tickets/Tickets";
 import Game from "./Components/Game/Game";
 
-import { Grid, Segment } from "semantic-ui-react";
+import { Button, Grid, Segment } from "semantic-ui-react";
 
 import "semantic-ui-css/semantic.min.css";
 
@@ -176,6 +176,17 @@ class App extends Component {
     this.fetchData();
   };
 
+  // TODO: remove as soon as it is not needed anymore
+  skipBlockHandler = async () => {
+    const { contract, accounts } = this.state;
+
+    await contract.methods
+      .skipBlock()
+      .send({ from: accounts[0] });
+
+    this.fetchData();
+  };
+
   /////////////////////////////////////////////////////////////////////////////
   // utils
   /////////////////////////////////////////////////////////////////////////////
@@ -201,6 +212,10 @@ class App extends Component {
     return (
       <div>
         <SiteHeader />
+        {/* TODO: remove as soon as it is not needed anymore*/}
+        <div style={{ textAlign: "center", margin: "1rem" }}>
+          <Button secondary onClick={this.skipBlockHandler}>Skip Block</Button>
+        </div>
         <Wrapper>
           <Grid>
           <Grid.Row>
