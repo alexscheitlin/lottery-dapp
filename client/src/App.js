@@ -21,6 +21,7 @@ class App extends Component {
     activeAccountBalance: -1,
     contract: null,
     currentBlock: null,
+    drawBlock: null,
     endBlock: null,
     jackpot: null,
     startBock: null,
@@ -129,9 +130,11 @@ class App extends Component {
   updateGameBlocks = async (contract) => {
     const startBlock = await contract.methods.getStartBlockOfCurrentGame().call();
     const endBlock = await contract.methods.getEndBlockOfCurrentGame().call();
+    const drawBlock = await contract.methods.getDrawBlockOfCurrentGame().call();
     this.setState({
       startBlock: parseInt(startBlock, 10),
-      endBlock: parseInt(endBlock, 10)
+      endBlock: parseInt(endBlock, 10),
+      drawBlock: parseInt(drawBlock, 10)
     });
   }
 
@@ -244,6 +247,7 @@ class App extends Component {
                       startBlock={this.state.startBlock}
                       currentBlock={this.state.currentBlock}
                       endBlock={this.state.endBlock}
+                      drawBlock={this.state.drawBlock}
                     />
                     <Game
                       minNumber={this.state.minNumber}
