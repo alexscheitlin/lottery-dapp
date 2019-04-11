@@ -157,7 +157,7 @@ class App extends Component {
       .buyTicket(number)
       .send({ from: accounts[0], value: this.etherToWei(1) });
 
-    this.checkForChanges();
+    this.fetchData();
   };
 
   endGameClickHandler = async () => {
@@ -173,7 +173,7 @@ class App extends Component {
       .endGame()
       .send({ from: accounts[0] });
 
-    this.checkForChanges();
+    this.fetchData();
   };
 
   /////////////////////////////////////////////////////////////////////////////
