@@ -183,12 +183,13 @@ contract Lottery {
         return currentGame.drawBlock;
     }
     
-    function getCurrentBlock() public view returns(uint){
+    function getCurrentBlock() public view returns(uint) {
         return block.number;
     }
     
     // This function is only used to force ganache to add a block and thus controll the speed of the blockchain manually
-    function skipBlock() public{}
+    // TODO: remove as soon as it is not needed anymore
+    function skipBlock() public pure {}
     
     // /////////////////////////////////////////////////////////////////
     // private functions

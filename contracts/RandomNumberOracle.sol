@@ -5,19 +5,21 @@ contract RandomNumberOracle{
     // @dev The miner of the defined block number has the possiblity to withhold a mined block in order to manipulate the randomness.
     // @param min The lower boundary of the random range (min is part of the range)
     // @param max The upper boundary of the random range (max is part of the range)
-    // @param blockNumber The block number which will is used to create the random numbers
+    // @param blockNumber The block number which is used to create the random numbers
     // @return A random integer greater or equal to min and smaller or equal to max
     function getRandomNumber(uint min, uint max, uint blockNumber) public view returns(uint){
         require(block.number > blockNumber);
         return (uint(blockhash(blockNumber)) % (max - min + 1)) + min;
     }
     
-    function a(uint blockNumber) public view returns(uint){
+    // TODO: remove as soon as it is not needed anymore
+    function a(uint blockNumber) public view returns(uint) {
         require(block.number > blockNumber);
         return 1;
     }
     
-    function b() public view returns(uint) {
+    // TODO: remove as soon as it is not needed anymore
+    function b() public pure returns(uint) {
         return 1;
     }
 }
