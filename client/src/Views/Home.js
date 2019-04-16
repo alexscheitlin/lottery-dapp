@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import LotteryContract from "../contracts/Lottery.json";
 import getWeb3 from "../utils/getWeb3";
+import {weiToEther, etherToWei} from "../utils/conversion";
 
 import Wrapper from "../Components/shared/Wrapper";
 import Loading from "../Components/shared/Loading";
@@ -149,7 +150,7 @@ class App extends Component {
   updateJackpot = async contract => {
     const jackpot = await contract.methods.getJackpot().call();
     if (this._isMounted) {
-      this.setState({ jackpot: this.weiToEther(jackpot) });
+      this.setState({ jackpot: weiToEther(jackpot) });
     }
   };
 
@@ -195,7 +196,7 @@ class App extends Component {
 
     await contract.methods
       .buyTicket(number)
-      .send({ from: accounts[0], value: this.etherToWei(1) });
+      .send({ from: accounts[0], value: etherToWei(1) });
 
     this.fetchData();
   };
@@ -230,9 +231,6 @@ class App extends Component {
   /////////////////////////////////////////////////////////////////////////////
   // utils
   /////////////////////////////////////////////////////////////////////////////
-
-  etherToWei = value => value * 1000000000000000000;
-  weiToEther = value => Math.round((value / 1000000000000000000) * 100) / 100;
 
   isNumber = inputToCheck => {
     return !isNaN(inputToCheck);
@@ -269,7 +267,7 @@ class App extends Component {
               <Grid.Column width={8}>
                 <div style={{ textAlign: "center", margin: "1rem" }}>
                   <Segment>
-                  Your account has <strong>{this.weiToEther(this.state.activeAccountBalance)}</strong>  ETH 
+                  Your account has <strong>{weiToEther(this.state.activeAccountBalance)}</strong>  ETH 
                   </Segment>
                 </div>
               </Grid.Column>
