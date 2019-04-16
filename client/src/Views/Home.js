@@ -108,7 +108,6 @@ class App extends Component {
   };
 
   fetchData = async () => {
-    console.log("[HOME] fetchData");
     const { contract, web3 } = this.state;
 
     // fetch accounts from metamask

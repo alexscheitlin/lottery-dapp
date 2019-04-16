@@ -3,9 +3,9 @@ import React, { Component } from "react";
 import Wrapper from "../Components/shared/Wrapper";
 import LotteryContract from "../contracts/Lottery.json";
 import getWeb3 from "../utils/getWeb3";
-import {weiToEther, etherToWei} from "../utils/conversion";
+import { weiToEther, etherToWei } from "../utils/conversion";
 
-import { Grid, Segment } from "semantic-ui-react";
+import { Grid, Segment, Pagination, Header } from "semantic-ui-react";
 
 class History extends Component {
   _isMounted = false;
@@ -13,7 +13,12 @@ class History extends Component {
   state = {
     web3: null,
     contract: null,
-    jackpot: null
+
+    displayedGames: [], // 0 -> first ever game played
+    nrOfPastGames: 0, // nrOfPastGames -1 corresponds to the index of the most recent game
+    batchSize: 3, // how many games to display per 'page'
+    activePage: 1,
+    numberOfPages: 1
   };
 
   /////////////////////////////////////////////////////////////////////////////
@@ -40,7 +45,7 @@ class History extends Component {
         });
       }
 
-      this.fetchData();
+      this.loadGamesOfCurrentPage(1);
     } catch (error) {
       // catch any errors for any of the above operations
       console.error(error);
@@ -58,16 +63,52 @@ class History extends Component {
   }, 2000);
 
   fetchData = async () => {
-    console.log("[History] fetchData");
-    const { contract, web3 } = this.state;
-    this.updateJackpot(contract);
+    this.loadGamesOfCurrentPage(this.state.activePage);
   };
 
-  updateJackpot = async contract => {
-    const jackpot = await contract.methods.getJackpot().call();
-    if (this._isMounted) {
-      this.setState({ jackpot: weiToEther(jackpot) });
+  loadGamesOfCurrentPage = async activePage => {
+    const { contract } = this.state;
+
+    const nrOfPastGames = await contract.methods
+      .getNumberOfFinishedGames()
+      .call();
+
+    // how many items to display per page
+    const batch = this.state.batchSize;
+
+    let head = nrOfPastGames - 1 - (activePage - 1) * batch;
+    let tail = head - (batch - 1);
+
+    const thisPageHasRest = nrOfPastGames < activePage * batch;
+
+    if (nrOfPastGames % batch !== 0 && thisPageHasRest) {
+      tail = 0;
     }
+
+    const displayedGames = [];
+    for (head; head >= tail; head--) {
+      const game = await contract.methods.finishedGames(head).call();
+      displayedGames.push(game);
+    }
+
+    let numberOfPages =
+      numberOfPages % batch !== 0
+        ? Math.floor(nrOfPastGames / batch) + 1
+        : Math.floor(nrOfPastGames / batch);
+
+    this.setState({
+      nrOfPastGames: nrOfPastGames,
+      displayedGames: displayedGames,
+      numberOfPages: numberOfPages
+    });
+  };
+
+  /////////////////////////////////////////////////////////////////////////////
+  // click handlers
+  /////////////////////////////////////////////////////////////////////////////
+  changePageClickHandler = (event, data) => {
+    this.setState({ activePage: data.activePage });
+    this.loadGamesOfCurrentPage(data.activePage);
   };
 
   /////////////////////////////////////////////////////////////////////////////
@@ -91,10 +132,22 @@ class History extends Component {
       <Wrapper>
         <Grid>
           <Grid.Row>
-            <Grid.Column>
-              <Segment>
-                There are {this.state.jackpot || 0} ETH in the Jackpot right now
-              </Segment>
+            <Grid.Column style={{ marginTop: "1rem" }}>
+              <Header>Past Games</Header>
+              {this.state.displayedGames.map((game, index) => (
+                <Segment key={index}>
+                  Lucky Number was: {game.luckyNumber}
+                </Segment>
+              ))}
+              <Pagination
+                defaultActivePage={1}
+                firstItem={null}
+                lastItem={null}
+                pointing
+                secondary
+                totalPages={this.state.numberOfPages}
+                onPageChange={this.changePageClickHandler}
+              />
             </Grid.Column>
           </Grid.Row>
         </Grid>
