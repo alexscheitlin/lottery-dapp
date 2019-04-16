@@ -3,9 +3,19 @@ import React, { Component } from "react";
 import Wrapper from "../Components/shared/Wrapper";
 import LotteryContract from "../contracts/Lottery.json";
 import getWeb3 from "../utils/getWeb3";
-import { weiToEther, etherToWei } from "../utils/conversion";
+import { weiToEther } from "../utils/conversion";
 
-import { Grid, Segment, Pagination, Header } from "semantic-ui-react";
+import {
+  Grid,
+  Pagination,
+  Header,
+  Card,
+  Statistic,
+  Icon,
+  Label,
+  Modal,
+  Button
+} from "semantic-ui-react";
 
 class History extends Component {
   _isMounted = false;
@@ -16,7 +26,7 @@ class History extends Component {
 
     displayedGames: [], // 0 -> first ever game played
     nrOfPastGames: 0, // nrOfPastGames -1 corresponds to the index of the most recent game
-    batchSize: 3, // how many games to display per 'page'
+    batchSize: 6, // how many games to display per 'page'
     activePage: 1,
     numberOfPages: 1
   };
@@ -128,26 +138,123 @@ class History extends Component {
   // render component
   /////////////////////////////////////////////////////////////////////////////
   render() {
+    // TODO: refactor into several components, this was just quickly put together
+    // to see how it looks like
     return (
       <Wrapper>
         <Grid>
           <Grid.Row>
             <Grid.Column style={{ marginTop: "1rem" }}>
-              <Header>Past Games</Header>
-              {this.state.displayedGames.map((game, index) => (
-                <Segment key={index}>
-                  Lucky Number was: {game.luckyNumber}
-                </Segment>
-              ))}
-              <Pagination
-                defaultActivePage={1}
-                firstItem={null}
-                lastItem={null}
-                pointing
-                secondary
-                totalPages={this.state.numberOfPages}
-                onPageChange={this.changePageClickHandler}
-              />
+              <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                <Pagination
+                  defaultActivePage={1}
+                  firstItem={null}
+                  lastItem={null}
+                  pointing
+                  secondary
+                  totalPages={this.state.numberOfPages}
+                  onPageChange={this.changePageClickHandler}
+                />
+              </div>
+              <Card.Group itemsPerRow={3}>
+                {this.state.displayedGames.map((game, index) => (
+                  <Card fluid key={index}>
+                    <Card.Content>
+                      <Card.Header>
+                        <Label
+                          circular
+                          style={{
+                            backgroundColor: "rgb(93, 133, 164)",
+                            color: "white"
+                          }}
+                          size="huge"
+                        >
+                          {game.luckyNumber}
+                        </Label>
+                        <Statistic floated="right" size="tiny">
+                          <Statistic.Value>
+                            <Icon name="ethereum" />{" "}
+                            {weiToEther(game.jackpot) || "0"}
+                          </Statistic.Value>
+                          <Statistic.Label>Jackpot</Statistic.Label>
+                        </Statistic>
+                      </Card.Header>
+                      <Card.Description>
+                        <Grid>
+                          <Grid.Row columns={2}>
+                            <Grid.Column textAlign="center">
+                              <Statistic size="tiny">
+                                <Statistic.Value>
+                                  {game.numberOfWinners || 0}{" "}
+                                  <Icon name="winner" />
+                                </Statistic.Value>
+                                <Statistic.Label>Winners</Statistic.Label>
+                              </Statistic>
+                            </Grid.Column>
+                            <Grid.Column textAlign="center">
+                              <Statistic size="tiny">
+                                <Statistic.Value>
+                                  {game.numberOfParticipants || 0}{" "}
+                                  <Icon name="users" />
+                                </Statistic.Value>
+                                <Statistic.Label>Participants</Statistic.Label>
+                              </Statistic>
+                            </Grid.Column>
+                          </Grid.Row>
+                          <Grid.Row columns={2}>
+                            <Grid.Column textAlign="center">
+                              <Statistic size="tiny">
+                                <Statistic.Value>
+                                  <Icon name="square outline" /> #{" "}
+                                  {game.endBlock || 0}
+                                </Statistic.Value>
+                                <Statistic.Label>End Block</Statistic.Label>
+                              </Statistic>
+                            </Grid.Column>
+                            <Grid.Column textAlign="center">
+                              <Statistic size="tiny">
+                                <Statistic.Value>
+                                  <Icon name="square outline" /> #{" "}
+                                  {game.drawBlock || 0}
+                                </Statistic.Value>
+                                <Statistic.Label>Draw Block</Statistic.Label>
+                              </Statistic>
+                            </Grid.Column>
+                          </Grid.Row>
+                          <Grid.Row>
+                            <Grid.Column textAlign="center">
+                              <Modal trigger={<Button>more info</Button>}>
+                                <Modal.Content>
+                                  <Statistic>
+                                    <Statistic.Value>
+                                      <Icon name="ethereum" />{" "}
+                                      {weiToEther(game.jackpot) || "0"}
+                                    </Statistic.Value>
+                                    <Statistic.Label>Jackpot</Statistic.Label>
+                                  </Statistic>
+                                  <Modal.Description>
+                                    <Header>Some Header Text {index}</Header>
+                                    <p>
+                                      Lorem ipsum dolor sit amet, consetetur
+                                      sadipscing elitr, sed diam nonumy eirmod
+                                      tempor invidunt ut labore et dolore magna
+                                      aliquyam erat, sed diam voluptua. At vero
+                                      eos et accusam et justo duo dolores et ea
+                                      rebum. Stet clita kasd gubergren, no sea
+                                      takimata sanctus est Lorem ipsum dolor sit
+                                      amet.
+                                    </p>
+                                  </Modal.Description>
+                                </Modal.Content>
+                              </Modal>
+                            </Grid.Column>
+                          </Grid.Row>
+                        </Grid>
+                      </Card.Description>
+                    </Card.Content>
+                  </Card>
+                ))}
+              </Card.Group>
             </Grid.Column>
           </Grid.Row>
         </Grid>

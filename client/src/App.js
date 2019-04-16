@@ -26,11 +26,11 @@ class App extends Component {
             style={{ padding: "1em 0em" }}
             vertical
           >
-            <Header as="h1" textAlign="center" icon>
+            <Header as="h1" textAlign="center" style={{marginTop: '1rem'}} icon>
               <Icon inverted name="gem" />
               Lottery dApp
               <Header.Subheader style={{ color: "white" }}>
-                <pre>lose your money and make us rich</pre>
+                <pre>who doesn't like losing money</pre>
               </Header.Subheader>
             </Header>
             <Menu pointing secondary inverted size="large">
