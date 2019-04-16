@@ -8,7 +8,9 @@ contract Lottery {
     uint constant DRAW_PERIOD = 1;          // number of blocks
     uint constant TICKET_PRICE = 1 ether;
     uint constant MIN_NUMBER = 1;
-    uint constant MAX_NUMBER = 20;
+    uint constant MAX_NUMBER = 5;
+    uint constant MAX_AMOUNT_TICKETS = 3;
+    uint constant MAX_PARTICIPANTS = 50;
     
     struct Game {
         uint startBlock;
@@ -65,6 +67,10 @@ contract Lottery {
         for (uint i=0; i<currentGame.numberOfParticipants; i++) {
             // add number to existing participant
             if (currentGame.participants[i].addr == msg.sender) {
+                
+                // verify that buyer has not bought too many tickets
+                require(currentGame.participants[i].numbers.length < MAX_AMOUNT_TICKETS);
+                
                 currentGame.participants[i].numbers.push(number);
                 foundParticipant = true;
                 break;
@@ -72,6 +78,9 @@ contract Lottery {
         }
         
         if (!foundParticipant) {
+            // verify that the number of participants does not exceed the participant limit
+            require(currentGame.numberOfParticipants < MAX_PARTICIPANTS);
+            
             // create new participant
             uint[] memory numbers = new uint[](1);
             numbers[0] = number;
