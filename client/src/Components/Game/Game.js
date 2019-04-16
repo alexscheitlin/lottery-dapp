@@ -39,8 +39,8 @@ class Game extends Component {
           activeNumber={this.state.pressedNumber}
           onClick={this.numberClickHandler}
           />
-        <Button secondary onClick={this.buyTicket}>Buy Ticket</Button>
-        <Button secondary onClick={this.endGame}>End Game</Button>
+        <Button secondary onClick={this.buyTicket} disabled={this.state.pressedNumber === -1}>Buy Ticket</Button>
+        <Button secondary onClick={this.endGame} disabled={this.state.gameEnded}>End Game</Button>
       </Segment>
     );
   }

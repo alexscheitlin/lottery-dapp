@@ -18,6 +18,7 @@ class App extends Component {
   _isMounted = false;
 
   state = {
+    gameEnded: null,
     accounts: null,
     activeAccount: null,
     activeAccountBalance: -1,
@@ -94,23 +95,15 @@ class App extends Component {
   /////////////////////////////////////////////////////////////////////////////
 
   fetchInitialData = async () => {
-    const { contract } = this.state;
-
-    // get minimum allowed number for tickets
-    const minNumber = await contract.methods.getMinNumber().call();
-    if (this._isMounted) {
-      this.setState({
-        minNumber: parseInt(minNumber, 10)
-      });
+    if (!this._isMounted) {
+        return;
     }
 
-    // get maximum allowed number for tickets
-    const maxNumber = await contract.methods.getMaxNumber().call();
-    if (this._isMounted) {
-      this.setState({
-        maxNumber: parseInt(maxNumber, 10)
-      });
-    }
+    this.setState({
+      gameEnded: await this.state.contract.methods.hasGameEnded().call(),
+      minNumber: parseInt(await this.state.contract.methods.getMinNumber().call(), 10),
+      maxNumber: parseInt(await this.state.contract.methods.getMaxNumber().call(), 10)
+    });
   };
 
   fetchData = async () => {
@@ -284,6 +277,7 @@ class App extends Component {
                       drawBlock={this.state.drawBlock}
                     />
                     <Game
+                      gameEnded={this.state.gameEnded}
                       minNumber={this.state.minNumber}
                       maxNumber={this.state.maxNumber}
                       buyTicket={this.buyTicketClickHandler}
