@@ -4,7 +4,6 @@ import getWeb3 from "../utils/getWeb3";
 
 import Wrapper from "../Components/shared/Wrapper";
 import Loading from "../Components/shared/Loading";
-import SiteHeader from "../Components/shared/SiteHeader";
 
 import Dashboard from "../Components/Dashboard/Dashboard";
 import Tickets from "../Components/Tickets/Tickets";
@@ -15,6 +14,8 @@ import { Button, Grid, Segment } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 
 class App extends Component {
+  _isMounted = false;
+
   state = {
     accounts: null,
     activeAccount: null,
@@ -28,7 +29,15 @@ class App extends Component {
     tickets: null,
     maxNumber: -1,
     minNumber: -1,
-    web3: null,
+    web3: null
+  };
+
+  /////////////////////////////////////////////////////////////////////////////
+  // cleanup component state
+  /////////////////////////////////////////////////////////////////////////////
+  componentWillUnmount = () => {
+    this._isMounted = false;
+    clearInterval(this.fetchDataPolling);
   };
 
   /////////////////////////////////////////////////////////////////////////////
@@ -36,6 +45,8 @@ class App extends Component {
   /////////////////////////////////////////////////////////////////////////////
 
   componentDidMount = async () => {
+    this._isMounted = true;
+
     try {
       // get network provider and web3 instance
       const web3 = await getWeb3();
@@ -49,10 +60,12 @@ class App extends Component {
       );
 
       // set web3 and contract to the state
-      this.setState({
-        web3,
-        contract
-      });
+      if (this._isMounted) {
+        this.setState({
+          web3,
+          contract
+        });
+      }
 
       // initially fetch data from the smart contract and store it in the state
       this.fetchInitialData();
@@ -65,6 +78,10 @@ class App extends Component {
       );
     }
 
+    this.fetchDataPolling();
+  };
+
+  fetchDataPolling = () => {
     // periodically check for changes of the data in the blockhain
     setInterval(() => {
       this.fetchData();
@@ -80,31 +97,41 @@ class App extends Component {
 
     // get minimum allowed number for tickets
     const minNumber = await contract.methods.getMinNumber().call();
-    this.setState({
-      minNumber: parseInt(minNumber, 10)
-    });
+    if (this._isMounted) {
+      this.setState({
+        minNumber: parseInt(minNumber, 10)
+      });
+    }
 
     // get maximum allowed number for tickets
     const maxNumber = await contract.methods.getMaxNumber().call();
-    this.setState({
-      maxNumber: parseInt(maxNumber, 10)
-    });
-  }
+    if (this._isMounted) {
+      this.setState({
+        maxNumber: parseInt(maxNumber, 10)
+      });
+    }
+  };
 
   fetchData = async () => {
     const { contract, web3 } = this.state;
 
     // fetch accounts from metamask
     const accounts = await web3.eth.getAccounts();
-    this.setState({ accounts: accounts });
+    if (this._isMounted) {
+      this.setState({ accounts: accounts });
+    }
 
     // get active account
     const activeAccount = accounts[0];
-    this.setState({ activeAccount: activeAccount });
+    if (this._isMounted) {
+      this.setState({ activeAccount: activeAccount });
+    }
 
     // fetch balance of active account
     const activeAccountBalance = await web3.eth.getBalance(activeAccount);
-    this.setState({ activeAccountBalance: activeAccountBalance });
+    if (this._isMounted) {
+      this.setState({ activeAccountBalance: activeAccountBalance });
+    }
 
     this.updateTickets(contract);
     this.updateJackpot(contract);
@@ -112,31 +139,41 @@ class App extends Component {
     this.updateGameBlocks(contract);
   };
 
-  updateTickets = async (contract) => {
+  updateTickets = async contract => {
     const tickets = await contract.methods.getMyTickets().call();
-    this.setState({ tickets: tickets });
+    if (this._isMounted) {
+      this.setState({ tickets: tickets });
+    }
   };
 
-  updateJackpot = async (contract) => {
+  updateJackpot = async contract => {
     const jackpot = await contract.methods.getJackpot().call();
-    this.setState({ jackpot: this.weiToEther(jackpot) });
-  }
+    if (this._isMounted) {
+      this.setState({ jackpot: this.weiToEther(jackpot) });
+    }
+  };
 
-  updateCurrentBlock = async (web3) => {
+  updateCurrentBlock = async web3 => {
     const currentBlock = await web3.eth.getBlockNumber();
-    this.setState({ currentBlock: currentBlock });
-  }
+    if (this._isMounted) {
+      this.setState({ currentBlock: currentBlock });
+    }
+  };
 
-  updateGameBlocks = async (contract) => {
-    const startBlock = await contract.methods.getStartBlockOfCurrentGame().call();
+  updateGameBlocks = async contract => {
+    const startBlock = await contract.methods
+      .getStartBlockOfCurrentGame()
+      .call();
     const endBlock = await contract.methods.getEndBlockOfCurrentGame().call();
     const drawBlock = await contract.methods.getDrawBlockOfCurrentGame().call();
-    this.setState({
-      startBlock: parseInt(startBlock, 10),
-      endBlock: parseInt(endBlock, 10),
-      drawBlock: parseInt(drawBlock, 10)
-    });
-  }
+    if (this._isMounted) {
+      this.setState({
+        startBlock: parseInt(startBlock, 10),
+        endBlock: parseInt(endBlock, 10),
+        drawBlock: parseInt(drawBlock, 10)
+      });
+    }
+  };
 
   /////////////////////////////////////////////////////////////////////////////
   // click handlers
@@ -168,8 +205,8 @@ class App extends Component {
     const hasGameEnded = await contract.methods.hasGameEnded().call();
 
     if (!hasGameEnded) {
-        alert("Game is still running!");
-        return;
+      alert("Game is still running!");
+      return;
     }
 
     await contract.methods
@@ -214,35 +251,34 @@ class App extends Component {
   render() {
     return (
       <div>
-        <SiteHeader />
         {/* TODO: remove as soon as it is not needed anymore*/}
         <div style={{ textAlign: "center", margin: "1rem" }}>
           <Button secondary onClick={this.skipBlockHandler}>Skip Block</Button>
         </div>
         <Wrapper>
           <Grid>
-          <Grid.Row>
+            <Grid.Row>
               <Grid.Column width={8}>
-              <div style={{ textAlign: "center", margin: "1rem" }}>
-            <Segment>
-              <strong>Account: </strong>
-              {this.state.activeAccount}
-            </Segment>
-          </div>
-              </Grid.Column> 
+                <div style={{ textAlign: "center", margin: "1rem" }}>
+                  <Segment>
+                    <strong>Account: </strong>
+                    {this.state.activeAccount}
+                  </Segment>
+                </div>
+              </Grid.Column>
               <Grid.Column width={8}>
-              <div style={{ textAlign: "center", margin: "1rem" }}>
-            <Segment>              
-              Your account has <strong>{this.weiToEther(this.state.activeAccountBalance)}</strong>  ETH 
-            </Segment>
-          </div>
-                </Grid.Column> 
-              </Grid.Row>
+                <div style={{ textAlign: "center", margin: "1rem" }}>
+                  <Segment>
+                  Your account has <strong>{this.weiToEther(this.state.activeAccountBalance)}</strong>  ETH 
+                  </Segment>
+                </div>
+              </Grid.Column>
+            </Grid.Row>
             <Grid.Row>
               <Grid.Column>
                 {this.state.web3 ? (
                   <div>
-                    <Dashboard 
+                    <Dashboard
                       jackpot={this.state.jackpot}
                       startBlock={this.state.startBlock}
                       currentBlock={this.state.currentBlock}
