@@ -13,10 +13,12 @@ class History extends Component {
   state = {
     web3: null,
     contract: null,
-    games: null,
     jackpot: null
   };
 
+  /////////////////////////////////////////////////////////////////////////////
+  // initialize component state
+  /////////////////////////////////////////////////////////////////////////////
   loadWeb3 = async () => {
     try {
       // get network provider and web3 instance
@@ -46,22 +48,20 @@ class History extends Component {
         "Failed to load web3, accounts, or contract. Check console for details."
       );
     }
-
-    this.fetchDataPolling();
-  }
-
-  fetchDataPolling = () => {
-    // periodically check for changes of the data in the blockhain
-    setInterval(() => {
-      this.fetchData();
-    }, 2000);
   };
 
+  /////////////////////////////////////////////////////////////////////////////
+  // fetch data
+  /////////////////////////////////////////////////////////////////////////////
+  fetchDataPolling = setInterval(() => {
+    this.fetchData();
+  }, 2000);
+
   fetchData = async () => {
+    console.log("[History] fetchData");
     const { contract, web3 } = this.state;
     this.updateJackpot(contract);
-  }
-
+  };
 
   updateJackpot = async contract => {
     const jackpot = await contract.methods.getJackpot().call();
@@ -70,23 +70,31 @@ class History extends Component {
     }
   };
 
+  /////////////////////////////////////////////////////////////////////////////
+  // react life cycle hooks
+  /////////////////////////////////////////////////////////////////////////////
   componentDidMount = () => {
     this._isMounted = true;
     this.loadWeb3();
-  }
+  };
 
   componentWillUnmount = () => {
     this._isMounted = false;
     clearInterval(this.fetchDataPolling);
-  }
+  };
 
+  /////////////////////////////////////////////////////////////////////////////
+  // render component
+  /////////////////////////////////////////////////////////////////////////////
   render() {
     return (
       <Wrapper>
         <Grid>
           <Grid.Row>
             <Grid.Column>
-              <Segment>There are {this.state.jackpot || 0} ETH in the Jackpot right now</Segment>
+              <Segment>
+                There are {this.state.jackpot || 0} ETH in the Jackpot right now
+              </Segment>
             </Grid.Column>
           </Grid.Row>
         </Grid>

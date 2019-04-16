@@ -78,20 +78,14 @@ class App extends Component {
         "Failed to load web3, accounts, or contract. Check console for details."
       );
     }
-
-    this.fetchDataPolling();
-  };
-
-  fetchDataPolling = () => {
-    // periodically check for changes of the data in the blockhain
-    setInterval(() => {
-      this.fetchData();
-    }, 2000);
   };
 
   /////////////////////////////////////////////////////////////////////////////
   // fetch data
   /////////////////////////////////////////////////////////////////////////////
+  fetchDataPolling = setInterval(() => {
+    this.fetchData();
+  }, 2000);
 
   fetchInitialData = async () => {
     const { contract } = this.state;
@@ -114,6 +108,7 @@ class App extends Component {
   };
 
   fetchData = async () => {
+    console.log("[HOME] fetchData");
     const { contract, web3 } = this.state;
 
     // fetch accounts from metamask
@@ -210,9 +205,7 @@ class App extends Component {
       return;
     }
 
-    await contract.methods
-      .endGame()
-      .send({ from: accounts[0] });
+    await contract.methods.endGame().send({ from: accounts[0] });
 
     this.fetchData();
   };
@@ -221,9 +214,7 @@ class App extends Component {
   skipBlockHandler = async () => {
     const { contract, accounts } = this.state;
 
-    await contract.methods
-      .skipBlock()
-      .send({ from: accounts[0] });
+    await contract.methods.skipBlock().send({ from: accounts[0] });
 
     this.fetchData();
   };
@@ -244,14 +235,16 @@ class App extends Component {
   };
 
   /////////////////////////////////////////////////////////////////////////////
-  // redner component
+  // render component
   /////////////////////////////////////////////////////////////////////////////
   render() {
     return (
       <div>
         {/* TODO: remove as soon as it is not needed anymore*/}
         <div style={{ textAlign: "center", margin: "1rem" }}>
-          <Button secondary onClick={this.skipBlockHandler}>Skip Block</Button>
+          <Button secondary onClick={this.skipBlockHandler}>
+            Skip Block
+          </Button>
         </div>
         <Wrapper>
           <Grid>
@@ -267,7 +260,11 @@ class App extends Component {
               <Grid.Column width={8}>
                 <div style={{ textAlign: "center", margin: "1rem" }}>
                   <Segment>
-                  Your account has <strong>{weiToEther(this.state.activeAccountBalance)}</strong>  ETH 
+                    Your account has{" "}
+                    <strong>
+                      {weiToEther(this.state.activeAccountBalance)}
+                    </strong>{" "}
+                    ETH
                   </Segment>
                 </div>
               </Grid.Column>
@@ -289,9 +286,7 @@ class App extends Component {
                       buyTicket={this.buyTicketClickHandler}
                       endGame={this.endGameClickHandler}
                     />
-                    <Tickets
-                      tickets={this.state.tickets}
-                    />
+                    <Tickets tickets={this.state.tickets} />
                   </div>
                 ) : (
                   <Loading
