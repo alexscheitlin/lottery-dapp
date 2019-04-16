@@ -11,15 +11,4 @@ contract RandomNumberOracle{
         require(block.number > blockNumber);
         return (uint(blockhash(blockNumber)) % (max - min + 1)) + min;
     }
-    
-    // TODO: remove as soon as it is not needed anymore
-    function a(uint blockNumber) public view returns(uint) {
-        require(block.number > blockNumber);
-        return 1;
-    }
-    
-    // TODO: remove as soon as it is not needed anymore
-    function b() public pure returns(uint) {
-        return 1;
-    }
 }
