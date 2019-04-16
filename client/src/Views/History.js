@@ -91,6 +91,10 @@ class History extends Component {
 
     const thisPageHasRest = nrOfPastGames < activePage * batch;
 
+    if (tail < 0) {
+      tail = 0;
+    }
+
     if (nrOfPastGames % batch !== 0 && thisPageHasRest) {
       tail = 0;
     }
@@ -111,6 +115,8 @@ class History extends Component {
       displayedGames: displayedGames,
       numberOfPages: numberOfPages
     });
+
+    console.log(this.state.displayedGames.length);
   };
 
   /////////////////////////////////////////////////////////////////////////////
