@@ -107,25 +107,22 @@ class App extends Component {
   };
 
   fetchData = async () => {
+    if (!this._isMounted) {
+      return;
+    }
+
     const { contract, web3 } = this.state;
 
     // fetch accounts from metamask
     const accounts = await web3.eth.getAccounts();
-    if (this._isMounted) {
-      this.setState({ accounts: accounts });
-    }
-
-    // get active account
     const activeAccount = accounts[0];
-    if (this._isMounted) {
-      this.setState({ activeAccount: activeAccount });
-    }
 
-    // fetch balance of active account
-    const activeAccountBalance = await web3.eth.getBalance(activeAccount);
-    if (this._isMounted) {
-      this.setState({ activeAccountBalance: activeAccountBalance });
-    }
+    this.setState({
+      gameEnded: await contract.methods.hasGameEnded().call(),
+      accounts: accounts,
+      activeAccount: activeAccount,
+      activeAccountBalance: await web3.eth.getBalance(activeAccount)
+    });
 
     this.updateTickets(contract);
     this.updateJackpot(contract);
