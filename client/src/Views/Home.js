@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import LotteryContract from "../contracts/Lottery.json";
 import getWeb3 from "../utils/getWeb3";
-import {weiToEther, etherToWei} from "../utils/conversion";
+import { weiToEther, etherToWei } from "../utils/conversion";
 
 import Wrapper from "../Components/shared/Wrapper";
 import Loading from "../Components/shared/Loading";
@@ -10,7 +10,7 @@ import Dashboard from "../Components/Dashboard/Dashboard";
 import Tickets from "../Components/Tickets/Tickets";
 import Game from "../Components/Game/Game";
 
-import { Button, Grid, Segment } from "semantic-ui-react";
+import { Button, Grid, Segment, Modal, Header, Icon } from "semantic-ui-react";
 
 import "semantic-ui-css/semantic.min.css";
 
@@ -32,7 +32,11 @@ class App extends Component {
     tickets: null,
     maxNumber: -1,
     minNumber: -1,
-    web3: null
+    web3: null,
+
+    showErrorModal: false,
+    errorModalHeader: "",
+    errorModalText: "Please try again if this was not your intention!"
   };
 
   /////////////////////////////////////////////////////////////////////////////
@@ -91,13 +95,19 @@ class App extends Component {
 
   fetchInitialData = async () => {
     if (!this._isMounted) {
-        return;
+      return;
     }
 
     this.setState({
       gameEnded: await this.state.contract.methods.hasGameEnded().call(),
-      minNumber: parseInt(await this.state.contract.methods.getMinNumber().call(), 10),
-      maxNumber: parseInt(await this.state.contract.methods.getMaxNumber().call(), 10)
+      minNumber: parseInt(
+        await this.state.contract.methods.getMinNumber().call(),
+        10
+      ),
+      maxNumber: parseInt(
+        await this.state.contract.methods.getMaxNumber().call(),
+        10
+      )
     });
   };
 
@@ -182,7 +192,13 @@ class App extends Component {
 
     await contract.methods
       .buyTicket(number)
-      .send({ from: accounts[0], value: etherToWei(1) });
+      .send({ from: accounts[0], value: etherToWei(1) })
+      .catch(err => {
+        this.setState({
+          showErrorModal: true,
+          errorModalHeader: "Buy Ticket rejected - no data was sent"
+        });
+      });
 
     this.fetchData();
   };
@@ -200,8 +216,16 @@ class App extends Component {
       alert("Game is not ready to draw!");
       return;
     }
-
-    await contract.methods.endGame().send({ from: accounts[0] });
+    
+    await contract.methods
+      .endGame()
+      .send({ from: accounts[0] })
+      .catch(err => {
+        this.setState({
+          showErrorModal: true,
+          errorModalHeader: "End Game rejected - no data was sent"
+        });
+      });
 
     this.fetchData();
   };
@@ -291,6 +315,29 @@ class App extends Component {
                     message={"Loading Web3, accounts, and contract..."}
                   />
                 )}
+                {this.state.showErrorModal ? (
+                  <Modal
+                    trigger={<Button>Basic Modal</Button>}
+                    basic
+                    size="tiny"
+                    open={this.state.showErrorModal}
+                    onClose={() =>
+                      this.setState({
+                        showErrorModal: false,
+                        errorModalHeader: "",
+                        errorModalText: ""
+                      })
+                    }
+                  >
+                    <Header>
+                      <Icon name="exclamation" />
+                      <Header.Content>
+                        {this.state.errorModalHeader}
+                      </Header.Content>
+                    </Header>
+                    <Modal.Content>{this.state.errorModalText}</Modal.Content>
+                  </Modal>
+                ) : null}
               </Grid.Column>
             </Grid.Row>
           </Grid>
