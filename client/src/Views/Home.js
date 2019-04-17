@@ -317,7 +317,6 @@ class App extends Component {
                 )}
                 {this.state.showErrorModal ? (
                   <Modal
-                    trigger={<Button>Basic Modal</Button>}
                     basic
                     size="tiny"
                     open={this.state.showErrorModal}
