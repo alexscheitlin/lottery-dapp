@@ -95,7 +95,7 @@ contract Lottery {
     }
     
     function endGame() public {
-        // verify that game has ended
+        // verify that game has ended and numbers are drawable
         require(this.isNumberDrawable());
         
         // TODO: draw lucky number via oracle SC
@@ -162,7 +162,8 @@ contract Lottery {
         return this.hasGameStarted() && !this.hasGameEnded();
     }
     
-    function isNumberDrawable() public view returns(bool){
+    // returns whether the game is ready to draw numbers
+    function isNumberDrawable() public view returns(bool) {
         return block.number > currentGame.drawBlock;
     }
     

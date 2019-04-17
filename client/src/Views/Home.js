@@ -198,9 +198,15 @@ class App extends Component {
   endGameClickHandler = async () => {
     const { contract, accounts } = this.state;
     const hasGameEnded = await contract.methods.hasGameEnded().call();
+    const isNumberDrawable = await contract.methods.isNumberDrawable().call();
 
     if (!hasGameEnded) {
       alert("Game is still running!");
+      return;
+    }
+
+    if (!isNumberDrawable) {
+      alert("Game is not ready to draw!");
       return;
     }
 
