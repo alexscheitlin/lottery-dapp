@@ -19,6 +19,7 @@ class App extends Component {
 
   state = {
     gameEnded: null,
+    isNumberDrawable: null,
     accounts: null,
     activeAccount: null,
     activeAccountBalance: -1,
@@ -113,6 +114,7 @@ class App extends Component {
 
     this.setState({
       gameEnded: await contract.methods.hasGameEnded().call(),
+      isNumberDrawable: await contract.methods.isNumberDrawable().call(),
       accounts: accounts,
       activeAccount: activeAccount,
       activeAccountBalance: await web3.eth.getBalance(activeAccount)
@@ -188,14 +190,13 @@ class App extends Component {
   endGameClickHandler = async () => {
     const { contract, accounts } = this.state;
     const hasGameEnded = await contract.methods.hasGameEnded().call();
-    const isNumberDrawable = await contract.methods.isNumberDrawable().call();
 
     if (!hasGameEnded) {
       alert("Game is still running!");
       return;
     }
 
-    if (!isNumberDrawable) {
+    if (!this.state.isNumberDrawable) {
       alert("Game is not ready to draw!");
       return;
     }
@@ -277,6 +278,7 @@ class App extends Component {
                     />
                     <Game
                       gameEnded={this.state.gameEnded}
+                      numberDrawable={this.state.isNumberDrawable}
                       minNumber={this.state.minNumber}
                       maxNumber={this.state.maxNumber}
                       buyTicket={this.buyTicketClickHandler}
