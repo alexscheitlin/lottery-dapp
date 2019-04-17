@@ -1,11 +1,11 @@
 import React from "react";
 
-import { Modal, Statistic, Icon, Header, Button } from "semantic-ui-react";
+import { Modal, Statistic, Icon, Button } from "semantic-ui-react";
 
 import { weiToEther } from "../../utils/conversion";
 
 const pastGameModal = props => (
-  <Modal trigger={<Button>more info</Button>}>
+  <Modal trigger={<Button>more info</Button>} size='tiny'>
     <Modal.Content>
       <Statistic>
         <Statistic.Value>
@@ -14,13 +14,8 @@ const pastGameModal = props => (
         <Statistic.Label>Jackpot</Statistic.Label>
       </Statistic>
       <Modal.Description>
-        <Header>Some Header Text {props.index}</Header>
         <p>
-          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-          nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
-          sed diam voluptua. At vero eos et accusam et justo duo dolores et ea
-          rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem
-          ipsum dolor sit amet.
+          This part here could be replaced with a list of the addresses of participants. Furthermore, we could list how much each address has won in this game.
         </p>
       </Modal.Description>
     </Modal.Content>
