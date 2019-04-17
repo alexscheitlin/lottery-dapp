@@ -18,6 +18,8 @@ class App extends Component {
   _isMounted = false;
 
   state = {
+    gameEnded: null,
+    isNumberDrawable: null,
     accounts: null,
     activeAccount: null,
     activeAccountBalance: -1,
@@ -88,45 +90,35 @@ class App extends Component {
   }, 2000);
 
   fetchInitialData = async () => {
-    const { contract } = this.state;
-
-    // get minimum allowed number for tickets
-    const minNumber = await contract.methods.getMinNumber().call();
-    if (this._isMounted) {
-      this.setState({
-        minNumber: parseInt(minNumber, 10)
-      });
+    if (!this._isMounted) {
+        return;
     }
 
-    // get maximum allowed number for tickets
-    const maxNumber = await contract.methods.getMaxNumber().call();
-    if (this._isMounted) {
-      this.setState({
-        maxNumber: parseInt(maxNumber, 10)
-      });
-    }
+    this.setState({
+      gameEnded: await this.state.contract.methods.hasGameEnded().call(),
+      minNumber: parseInt(await this.state.contract.methods.getMinNumber().call(), 10),
+      maxNumber: parseInt(await this.state.contract.methods.getMaxNumber().call(), 10)
+    });
   };
 
   fetchData = async () => {
+    if (!this._isMounted) {
+      return;
+    }
+
     const { contract, web3 } = this.state;
 
     // fetch accounts from metamask
     const accounts = await web3.eth.getAccounts();
-    if (this._isMounted) {
-      this.setState({ accounts: accounts });
-    }
-
-    // get active account
     const activeAccount = accounts[0];
-    if (this._isMounted) {
-      this.setState({ activeAccount: activeAccount });
-    }
 
-    // fetch balance of active account
-    const activeAccountBalance = await web3.eth.getBalance(activeAccount);
-    if (this._isMounted) {
-      this.setState({ activeAccountBalance: activeAccountBalance });
-    }
+    this.setState({
+      gameEnded: await contract.methods.hasGameEnded().call(),
+      isNumberDrawable: await contract.methods.isNumberDrawable().call(),
+      accounts: accounts,
+      activeAccount: activeAccount,
+      activeAccountBalance: await web3.eth.getBalance(activeAccount)
+    });
 
     this.updateTickets(contract);
     this.updateJackpot(contract);
@@ -198,14 +190,13 @@ class App extends Component {
   endGameClickHandler = async () => {
     const { contract, accounts } = this.state;
     const hasGameEnded = await contract.methods.hasGameEnded().call();
-    const isNumberDrawable = await contract.methods.isNumberDrawable().call();
 
     if (!hasGameEnded) {
       alert("Game is still running!");
       return;
     }
 
-    if (!isNumberDrawable) {
+    if (!this.state.isNumberDrawable) {
       alert("Game is not ready to draw!");
       return;
     }
@@ -286,6 +277,8 @@ class App extends Component {
                       drawBlock={this.state.drawBlock}
                     />
                     <Game
+                      gameEnded={this.state.gameEnded}
+                      numberDrawable={this.state.isNumberDrawable}
                       minNumber={this.state.minNumber}
                       maxNumber={this.state.maxNumber}
                       buyTicket={this.buyTicketClickHandler}
