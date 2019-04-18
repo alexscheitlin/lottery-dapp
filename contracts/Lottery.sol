@@ -7,6 +7,7 @@ contract Lottery {
     uint constant GAME_LENGTH = 3;          // number of blocks
     uint constant DRAW_PERIOD = 1;          // number of blocks
     uint constant TICKET_PRICE = 1 ether;
+    uint constant REFUND_AMOUNT = 0.1 ether;
     uint constant MIN_NUMBER = 1;
     uint constant MAX_NUMBER = 5;
     uint constant MAX_AMOUNT_TICKETS = 3;
@@ -98,28 +99,31 @@ contract Lottery {
         // verify that game has ended and numbers are drawable
         require(this.isNumberDrawable());
         
-        // TODO: draw lucky number via oracle SC
-        uint drawnNumber = oracle.getRandomNumber(MIN_NUMBER, MAX_NUMBER, currentGame.drawBlock);
-        currentGame.luckyNumber = drawnNumber;
-        
-        // determine winners
-        for (uint i=0; i<currentGame.numberOfParticipants; i++) {
-            for (uint j=0; j<currentGame.participants[i].numbers.length; j++) {
-                if (currentGame.participants[i].numbers[j] == drawnNumber) {
-                    currentGame.winners[currentGame.numberOfWinners++] = currentGame.participants[i].addr;
-                    break;
-                }
-            }
-        }
-        
-        // TODO: refund caller
+        // draw lucky number via oracle SC
+        currentGame.luckyNumber = oracle.getRandomNumber(MIN_NUMBER, MAX_NUMBER, currentGame.drawBlock);
         
         // keep track of jackpot
-        currentGame.jackpot = address(this).balance;
+        currentGame.jackpot = getJackpot();
         
-        // payout winners
-        for (uint i=0; i<currentGame.numberOfWinners; i++) {
-            currentGame.winners[i].transfer(currentGame.jackpot / currentGame.numberOfWinners);
+        // refund caller and payout winners
+        if (currentGame.numberOfParticipants > 0) {
+            // determine winners
+            for (uint i=0; i<currentGame.numberOfParticipants; i++) {
+                for (uint j=0; j<currentGame.participants[i].numbers.length; j++) {
+                    if (currentGame.participants[i].numbers[j] == currentGame.luckyNumber) {
+                        currentGame.winners[currentGame.numberOfWinners++] = currentGame.participants[i].addr;
+                        break;
+                    }
+                }
+            }
+        
+            // refund caller
+            msg.sender.transfer(REFUND_AMOUNT);
+        
+            // payout winners
+            for (uint i=0; i<currentGame.numberOfWinners; i++) {
+                currentGame.winners[i].transfer(currentGame.jackpot / currentGame.numberOfWinners);
+            }
         }
         
         // archive game
@@ -142,9 +146,13 @@ contract Lottery {
         return numbers;
     }
 
-    // return the smart contract's account balance
+    // return the winnable amount in the ongoing game
     function getJackpot() public view returns(uint) {
-        return address(this).balance;
+        if (address(this).balance >= REFUND_AMOUNT) {
+            return address(this).balance - REFUND_AMOUNT;
+        } else {
+            return 0;
+        }
     }
     
     // returns whether the current game has started
