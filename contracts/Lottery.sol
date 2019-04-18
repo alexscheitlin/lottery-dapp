@@ -119,7 +119,7 @@ contract Lottery {
         
         // payout winners
         for (uint i=0; i<currentGame.numberOfWinners; i++) {
-            currentGame.winners[i].transfer(address(this).balance / currentGame.numberOfWinners);
+            currentGame.winners[i].transfer(currentGame.jackpot / currentGame.numberOfWinners);
         }
         
         // archive game
