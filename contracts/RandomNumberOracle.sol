@@ -7,8 +7,8 @@ contract RandomNumberOracle{
     // @param max The upper boundary of the random range (max is part of the range)
     // @param blockNumber The block number which is used to create the random numbers
     // @return A random integer greater or equal to min and smaller or equal to max
-    function getRandomNumber(uint min, uint max, uint blockNumber) public view returns(uint){
+    function getRandomNumber(uint256 min, uint256 max, uint256 blockNumber) public view returns(uint256){
         require(block.number > blockNumber);
-        return (uint(blockhash(blockNumber)) % (max - min + 1)) + min;
+        return (uint256(blockhash(blockNumber)) % (max - min + 1)) + min;
     }
 }
