@@ -27,6 +27,9 @@ contract Lottery {
         
         // keep track of jackpot
         uint256 jackpot;
+
+        // keep track of lottery resolver
+        address resolver;
     }
     
     struct Participant {
@@ -104,6 +107,12 @@ contract Lottery {
         
         // keep track of jackpot
         currentGame.jackpot = getJackpot();
+
+        // keep track of lottery resolver
+        currentGame.resolver = msg.sender;
+
+        // archive all the statically allocated values
+        finishedGames[numberOfGames] = currentGame;
         
         // refund caller and payout winners
         if (currentGame.numberOfParticipants > 0) {
@@ -112,9 +121,13 @@ contract Lottery {
                 for (uint256 j=0; j<currentGame.participants[i].numbers.length; j++) {
                     if (currentGame.participants[i].numbers[j] == currentGame.luckyNumber) {
                         currentGame.winners[currentGame.numberOfWinners++] = currentGame.participants[i].addr;
-                        break;
+
+                        // archiving winners
+                        finishedGames[numberOfGames].winners[finishedGames[numberOfGames].numberOfWinners++] = currentGame.participants[i].addr;
                     }
                 }
+                // archiving participants
+                finishedGames[numberOfGames].participants[i] = currentGame.participants[i];
             }
         
             // refund caller
@@ -125,9 +138,8 @@ contract Lottery {
                 currentGame.winners[i].transfer(currentGame.jackpot / currentGame.numberOfWinners);
             }
         }
-        
-        // archive game
-        finishedGames[numberOfGames++] = currentGame;
+
+        numberOfGames++;
         
         // start new game
         currentGame = createNewGame(GAME_LENGTH);
@@ -204,6 +216,37 @@ contract Lottery {
     function getCurrentBlock() public view returns(uint256) {
         return block.number;
     }
+
+    // get all participants in a specific game
+    function getParticipants(uint256 gameIndex) public view returns(address[] memory _participantsAddr){
+        _participantsAddr = new address[](finishedGames[gameIndex].numberOfParticipants);
+        
+        for(uint256 i = 0; i < finishedGames[gameIndex].numberOfParticipants; i++){
+            _participantsAddr[i] = finishedGames[gameIndex].participants[i].addr;
+        }
+        
+        return _participantsAddr;
+    }
+    
+    // get the winners of a specific game
+    function getWinners(uint256 gameIndex) public view returns(address[] memory _winners){
+        _winners = new address[](finishedGames[gameIndex].numberOfWinners);
+        
+        for(uint256 i = 0; i < finishedGames[gameIndex].numberOfWinners; i++){
+            _winners[i] = finishedGames[gameIndex].winners[i];
+        }
+        
+        return _winners;
+    }
+
+    // get the tickets of an address in a specific game
+    function getParticipantNumbers(uint _gameIndex, address _address) public view returns(uint256[] memory){
+        for(uint256 i = 0; i < finishedGames[_gameIndex].numberOfParticipants; i++){
+            if(finishedGames[_gameIndex].participants[i].addr == _address){
+               return finishedGames[_gameIndex].participants[i].numbers;
+            }
+        }
+    }
     
     // This function is only used to force ganache to add a block and thus controll the speed of the blockchain manually
     // TODO: remove as soon as it is not needed anymore
@@ -221,7 +264,8 @@ contract Lottery {
             luckyNumber: 0,
             numberOfParticipants: 0,
             numberOfWinners: 0,
-            jackpot:0
+            jackpot: 0,
+            resolver: address(0)
         });
         
         return newGame;
