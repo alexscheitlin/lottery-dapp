@@ -19,6 +19,8 @@ class App extends Component {
 
   state = {
     constants: {
+      maxNumber: -1,
+      minNumber: -1,
       numbersPerTicket: -1
     },
     gameEnded: null,
@@ -33,8 +35,6 @@ class App extends Component {
     jackpot: null,
     startBock: null,
     tickets: null,
-    maxNumber: -1,
-    minNumber: -1,
     web3: null,
 
     showErrorModal: false,
@@ -103,9 +103,9 @@ class App extends Component {
 
     this.setState({
       gameEnded: await this.state.contract.methods.hasGameEnded().call(),
-      minNumber: parseInt(await this.state.contract.methods.MIN_NUMBER().call(), 10),
-      maxNumber: parseInt(await this.state.contract.methods.MAX_NUMBER().call(), 10),
       constants: {
+        maxNumber: parseInt(await this.state.contract.methods.MAX_NUMBER().call(), 10),
+        minNumber: parseInt(await this.state.contract.methods.MIN_NUMBER().call(), 10),
         numbersPerTicket: parseInt(await this.state.contract.methods.NUMBERS_PER_TICKET().call(), 10)
       }
     });
@@ -201,8 +201,8 @@ class App extends Component {
     // check all ticket numbers
     for(const number of numbers) {
       if (!this.isValid(number)) {
-        const minNumber = this.state.minNumber;
-        const maxNumber = this.state.maxNumber;
+        const minNumber = this.state.constants.minNumber;
+        const maxNumber = this.state.constants.maxNumber;
         alert(`All numbers must be between ${minNumber} and ${maxNumber}!`);
         return;
       }
@@ -324,8 +324,8 @@ class App extends Component {
                     <Game
                       gameEnded={this.state.gameEnded}
                       numberDrawable={this.state.isNumberDrawable}
-                      minNumber={this.state.minNumber}
-                      maxNumber={this.state.maxNumber}
+                      minNumber={this.state.constants.minNumber}
+                      maxNumber={this.state.constants.maxNumber}
                       numbersPerTicket={this.state.constants.numbersPerTicket}
                       buyTicket={this.buyTicketClickHandler}
                       endGame={this.endGameClickHandler}
