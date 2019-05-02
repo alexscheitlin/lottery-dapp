@@ -4,13 +4,13 @@ import "./RandomNumberOracle.sol";
 
 contract Lottery {
     
-    uint256 constant GAME_LENGTH = 3;          // number of blocks
-    uint256 constant TICKET_PRICE = 1 ether;
-    uint256 constant REFUND_AMOUNT = 0.1 ether;
-    uint256 constant MIN_NUMBER = 1;
-    uint256 constant MAX_NUMBER = 5;
-    uint256 constant MAX_AMOUNT_TICKETS = 3;
-    uint256 constant MAX_PARTICIPANTS = 50;
+    uint256 public constant GAME_LENGTH = 3;          // number of blocks
+    uint256 public constant TICKET_PRICE = 1 ether;
+    uint256 public constant REFUND_AMOUNT = 0.1 ether;
+    uint256 public constant MIN_NUMBER = 1;
+    uint256 public constant MAX_NUMBER = 5;
+    uint256 public constant MAX_AMOUNT_TICKETS = 3;
+    uint256 public constant MAX_PARTICIPANTS = 50;
     uint256 public constant NUMBERS_PER_TICKET = 2;
     
     struct Game {
