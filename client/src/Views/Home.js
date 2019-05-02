@@ -137,7 +137,12 @@ class App extends Component {
   };
 
   updateTickets = async contract => {
-    const tickets = await contract.methods.getMyTickets().call();
+    const numberOfTickets = await contract.methods.getMyTicketCountOfCurrentGame().call();
+    const tickets = [];
+    for(let i=0; i<numberOfTickets; i++) {
+      tickets[i] = await contract.methods.getMyTicketNumbersOfCurrentGame(i).call();
+    }
+
     if (this._isMounted) {
       this.setState({ tickets: tickets });
     }
@@ -191,7 +196,7 @@ class App extends Component {
     }
 
     await contract.methods
-      .buyTicket(number)
+      .buyTicket([number])
       .send({ from: accounts[0], value: etherToWei(1) })
       .catch(err => {
         this.setState({
