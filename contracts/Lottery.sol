@@ -7,8 +7,8 @@ contract Lottery {
     uint256 public constant GAME_LENGTH = 3;          // number of blocks
     uint256 public constant TICKET_PRICE = 1 ether;
     uint256 public constant REFUND_AMOUNT = 0.1 ether;
-    uint256 public constant MIN_NUMBER = 1;
-    uint256 public constant MAX_NUMBER = 5;
+    uint256 public constant MIN_NUMBER = 1;             // minimum required number in a ticket (inclusive)
+    uint256 public constant MAX_NUMBER = 5;             // maximum allowed number in a ticket (inclusive)
     uint256 public constant MAX_AMOUNT_TICKETS = 3;
     uint256 public constant MAX_PARTICIPANTS = 50;
     uint256 public constant NUMBERS_PER_TICKET = 2;
@@ -236,16 +236,6 @@ contract Lottery {
     // returns whether the game is ready to draw numbers
     function isNumberDrawable() public view returns(bool) {
         return block.number > currentGame.drawBlock;
-    }
-    
-    // returns minimum required number to buy a ticket (inclusive)
-    function getMinNumber() public pure returns(uint256) {
-        return MIN_NUMBER;
-    }
-    
-    // returns maximum allowed number to buy a ticket (inclusive)
-    function getMaxNumber() public pure returns(uint256) {
-        return MAX_NUMBER;
     }
     
     function getNumberOfFinishedGames() public view returns(uint256) {
