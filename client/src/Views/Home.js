@@ -368,6 +368,7 @@ class App extends Component {
                       gameEnded={this.state.gameEnded}
                       isNumberDrawable={this.state.isNumberDrawable}
                       previousWinners={this.state.previousWinners}
+                      activeAccount={this.state.activeAccount}
                     />
                     <Game
                       gameEnded={this.state.gameEnded}

@@ -33,7 +33,7 @@ const dashboard = props => (
           </Grid.Row>
           <Grid.Row>
             <Grid.Column>
-              <Winners previousWinners={props.previousWinners} />
+              <Winners previousWinners={props.previousWinners} activeAccount={props.activeAccount}/>
             </Grid.Column>
           </Grid.Row>
         </Grid.Column>
