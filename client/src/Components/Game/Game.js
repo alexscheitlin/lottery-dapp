@@ -20,10 +20,12 @@ class Game extends Component {
     const activeNumbers = this.state.activeNumbers;
     const activeNumberIndex = activeNumbers.indexOf(number);
 
-    if (activeNumberIndex != -1) {
+    if (activeNumberIndex !== -1) {
       activeNumbers.splice(activeNumberIndex, 1);
     } else {
-      activeNumbers.push(number);
+      if (activeNumbers.length !== this.props.numbersPerTicket) {
+        activeNumbers.push(number);
+      }
     }
 
     this.setState({
@@ -33,6 +35,9 @@ class Game extends Component {
 
   buyTicket = () => {
     this.props.buyTicket(this.state.activeNumbers);
+    this.setState({
+      activeNumbers: []
+    });
   };
 
   endGame = () => {
@@ -42,7 +47,7 @@ class Game extends Component {
   render() {
     return (
       <Segment textAlign='center'>
-        <p>Please choose {this.props.numbersPerTicket} {this.props.numbersPerTicket==1 ? "number" : "numbers"}.</p>
+        <p>Please choose {this.props.numbersPerTicket} {this.props.numbersPerTicket===1 ? "number" : "numbers"}.</p>
         <NumberGrid 
           minNumber={this.props.minNumber}
           maxNumber={this.props.maxNumber}
