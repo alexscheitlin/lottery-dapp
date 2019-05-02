@@ -245,21 +245,6 @@ contract Lottery {
         }
     }
 
-    // TODO: remove because currentGame is public
-    function getStartBlockOfCurrentGame() public view returns(uint256) {
-        return currentGame.startBlock;
-    }
-
-    // TODO: remove because currentGame is public
-    function getEndBlockOfCurrentGame() public view returns(uint256) {
-        return currentGame.endBlock;
-    }
-
-    // TODO: remove because currentGame is public
-    function getDrawBlockOfCurrentGame() public view returns(uint256){
-        return currentGame.drawBlock;
-    }
-
     // /////////////////////////////////
     // getter functions (finished games)
     // /////////////////////////////////

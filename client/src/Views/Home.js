@@ -165,16 +165,13 @@ class App extends Component {
   };
 
   updateGameBlocks = async contract => {
-    const startBlock = await contract.methods
-      .getStartBlockOfCurrentGame()
-      .call();
-    const endBlock = await contract.methods.getEndBlockOfCurrentGame().call();
-    const drawBlock = await contract.methods.getDrawBlockOfCurrentGame().call();
+    const currentGame = await contract.methods.currentGame().call();
+
     if (this._isMounted) {
       this.setState({
-        startBlock: parseInt(startBlock, 10),
-        endBlock: parseInt(endBlock, 10),
-        drawBlock: parseInt(drawBlock, 10)
+        startBlock: parseInt(currentGame.startBlock, 10),
+        endBlock: parseInt(currentGame.endBlock, 10),
+        drawBlock: parseInt(currentGame.drawBlock, 10)
       });
     }
   };
