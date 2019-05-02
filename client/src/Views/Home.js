@@ -18,6 +18,9 @@ class App extends Component {
   _isMounted = false;
 
   state = {
+    constants: {
+      numbersPerTicket: -1
+    },
     gameEnded: null,
     isNumberDrawable: null,
     accounts: null,
@@ -100,14 +103,11 @@ class App extends Component {
 
     this.setState({
       gameEnded: await this.state.contract.methods.hasGameEnded().call(),
-      minNumber: parseInt(
-        await this.state.contract.methods.getMinNumber().call(),
-        10
-      ),
-      maxNumber: parseInt(
-        await this.state.contract.methods.getMaxNumber().call(),
-        10
-      )
+      minNumber: parseInt(await this.state.contract.methods.getMinNumber().call(), 10),
+      maxNumber: parseInt(await this.state.contract.methods.getMaxNumber().call(), 10),
+      constants: {
+        numbersPerTicket: parseInt(await this.state.contract.methods.NUMBERS_PER_TICKET().call(), 10)
+      }
     });
   };
 
@@ -137,7 +137,12 @@ class App extends Component {
   };
 
   updateTickets = async contract => {
-    const tickets = await contract.methods.getMyTickets().call();
+    const numberOfTickets = await contract.methods.getMyTicketCountOfCurrentGame().call();
+    const tickets = [];
+    for(let i=0; i<numberOfTickets; i++) {
+      tickets[i] = await contract.methods.getMyTicketNumbersOfCurrentGame(i).call();
+    }
+
     if (this._isMounted) {
       this.setState({ tickets: tickets });
     }
@@ -176,22 +181,36 @@ class App extends Component {
   // click handlers
   /////////////////////////////////////////////////////////////////////////////
 
-  buyTicketClickHandler = async number => {
+  buyTicketClickHandler = async numbers => {
     const { contract, accounts } = this.state;
     const hasGameEnded = await contract.methods.hasGameEnded().call();
 
+    // do not allow tickets to be purchased after the current game has ended
     if (hasGameEnded) {
       alert("Game has ended!");
       return;
     }
 
-    if (!this.isNumber(number) || !this.isValid(number)) {
-      alert("Must be a number between 1 and 5!");
+    // check that enough numbers are given
+    const requiredNumbers = this.state.constants.numbersPerTicket;
+    if (numbers.length !== requiredNumbers) {
+      alert(`Please select ${requiredNumbers} ${requiredNumbers===1 ? "number" : "numbers"}.`);
       return;
     }
 
+    // check all ticket numbers
+    for(const number of numbers) {
+      if (!this.isValid(number)) {
+        const minNumber = this.state.minNumber;
+        const maxNumber = this.state.maxNumber;
+        alert(`All numbers must be between ${minNumber} and ${maxNumber}!`);
+        return;
+      }
+    }
+
+    // buy ticket
     await contract.methods
-      .buyTicket(number)
+      .buyTicket(numbers)
       .send({ from: accounts[0], value: etherToWei(1) })
       .catch(err => {
         this.setState({
@@ -251,6 +270,8 @@ class App extends Component {
     if (!this.isNumber(inputToCheck)) {
       return false;
     }
+
+    // TODO: do not use hard coded values (use values from this.state)
     return inputToCheck > 0 && inputToCheck < 6;
   };
 
@@ -305,6 +326,7 @@ class App extends Component {
                       numberDrawable={this.state.isNumberDrawable}
                       minNumber={this.state.minNumber}
                       maxNumber={this.state.maxNumber}
+                      numbersPerTicket={this.state.constants.numbersPerTicket}
                       buyTicket={this.buyTicketClickHandler}
                       endGame={this.endGameClickHandler}
                     />
