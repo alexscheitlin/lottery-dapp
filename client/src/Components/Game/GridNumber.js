@@ -6,7 +6,7 @@ import {Label} from 'semantic-ui-react';
 
 const gridNumber = (props) => {
 
-  let isPressed = props.value === props.activeNumber;
+  let isPressed = props.activeNumbers.indexOf(props.value) !== -1;
   const isPressedStyle = {
     backgroundColor: 'rgb(93, 133, 164)'
   }

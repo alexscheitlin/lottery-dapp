@@ -19,10 +19,15 @@ const ticket = (props) => {
   }
   return (
     <Card style={cardStyle}>
-    
       <Card.Content textAlign='center'>
-      <span style={indexStyle}># {props.index}</span>
-        <Label circular style={labelStyle} size='massive'>{props.number}</Label>
+        <span style={indexStyle}># {props.index}</span>
+        {
+          props.numbers.map((number, index) => {
+            return (
+              <Label circular style={labelStyle} size='massive' key={index}>{number}</Label>
+            )
+          })
+        }
       </Card.Content>
     </Card>
   )
