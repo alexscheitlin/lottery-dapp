@@ -11,7 +11,7 @@ contract Lottery {
     uint256 constant MAX_NUMBER = 5;
     uint256 constant MAX_AMOUNT_TICKETS = 3;
     uint256 constant MAX_PARTICIPANTS = 50;
-    uint256 constant NUMBERS_PER_TICKET = 1;
+    uint256 public constant NUMBERS_PER_TICKET = 1;
     
     struct Game {
         uint256 startBlock;

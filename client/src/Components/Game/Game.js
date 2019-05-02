@@ -33,6 +33,7 @@ class Game extends Component {
   render() {
     return (
       <Segment textAlign='center'>
+        <p>Please choose {this.props.numbersPerTicket} {this.props.numbersPerTicket==1 ? "number" : "numbers"}.</p>
         <NumberGrid 
           minNumber={this.props.minNumber}
           maxNumber={this.props.maxNumber}

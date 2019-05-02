@@ -18,6 +18,9 @@ class App extends Component {
   _isMounted = false;
 
   state = {
+    constants: {
+      numbersPerTicket: -1
+    },
     gameEnded: null,
     isNumberDrawable: null,
     accounts: null,
@@ -100,14 +103,11 @@ class App extends Component {
 
     this.setState({
       gameEnded: await this.state.contract.methods.hasGameEnded().call(),
-      minNumber: parseInt(
-        await this.state.contract.methods.getMinNumber().call(),
-        10
-      ),
-      maxNumber: parseInt(
-        await this.state.contract.methods.getMaxNumber().call(),
-        10
-      )
+      minNumber: parseInt(await this.state.contract.methods.getMinNumber().call(), 10),
+      maxNumber: parseInt(await this.state.contract.methods.getMaxNumber().call(), 10),
+      constants: {
+        numbersPerTicket: parseInt(await this.state.contract.methods.NUMBERS_PER_TICKET().call(), 10)
+      }
     });
   };
 
@@ -310,6 +310,7 @@ class App extends Component {
                       numberDrawable={this.state.isNumberDrawable}
                       minNumber={this.state.minNumber}
                       maxNumber={this.state.maxNumber}
+                      numbersPerTicket={this.state.constants.numbersPerTicket}
                       buyTicket={this.buyTicketClickHandler}
                       endGame={this.endGameClickHandler}
                     />
