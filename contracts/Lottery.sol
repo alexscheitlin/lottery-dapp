@@ -79,7 +79,7 @@ contract Lottery {
     // core functions
     // /////////////////////////////////
     
-    function buyTicket(uint256[] memory numbers) public payable {
+    function buyTicket(uint256[] memory _numbers) public payable {
         // verify that enough ether was sent
         require(msg.value == TICKET_PRICE);
         
@@ -87,12 +87,12 @@ contract Lottery {
         require(this.isGameOngoing());
         
         // verify that enough numbers are given
-        require(numbers.length == NUMBERS_PER_TICKET);
+        require(_numbers.length == NUMBERS_PER_TICKET);
         
         // verify that the numbers are not too small or too large
-        for (uint256 i=0; i<numbers.length; i++) {
-            require(numbers[i] >= MIN_NUMBER);
-            require(numbers[i] <= MAX_NUMBER);
+        for (uint256 i=0; i<_numbers.length; i++) {
+            require(_numbers[i] >= MIN_NUMBER);
+            require(_numbers[i] <= MAX_NUMBER);
         }
         
         // record the sender's address and the received numbers
@@ -103,7 +103,7 @@ contract Lottery {
                 // verify that buyer has not bought too many tickets
                 require(currentGame.participants[i].tickets.length < MAX_AMOUNT_TICKETS);
                 
-                currentGame.participants[i].tickets.push(numbers);
+                currentGame.participants[i].tickets.push(_numbers);
                 foundParticipant = true;
                 break;
             }
@@ -115,7 +115,7 @@ contract Lottery {
             
             // create new participant
             uint256[][] memory tickets = new uint256[][](1);
-            tickets[0] = numbers;
+            tickets[0] = _numbers;
             
             Participant memory p = Participant({
                 addr: msg.sender,
@@ -254,22 +254,22 @@ contract Lottery {
     }
 
     // get all participants in a specific (finished) game
-    function getParticipants(uint256 gameIndex) public view returns(address[] memory _participantsAddr){
-        _participantsAddr = new address[](finishedGames[gameIndex].numberOfParticipants);
+    function getParticipants(uint256 _gameIndex) public view returns(address[] memory _participantsAddr){
+        _participantsAddr = new address[](finishedGames[_gameIndex].numberOfParticipants);
 
-        for(uint256 i = 0; i < finishedGames[gameIndex].numberOfParticipants; i++){
-            _participantsAddr[i] = finishedGames[gameIndex].participants[i].addr;
+        for(uint256 i = 0; i < finishedGames[_gameIndex].numberOfParticipants; i++){
+            _participantsAddr[i] = finishedGames[_gameIndex].participants[i].addr;
         }
 
         return _participantsAddr;
     }
 
     // get the winners of a specific (finished) game
-    function getWinners(uint256 gameIndex) public view returns(address[] memory _winners){
-        _winners = new address[](finishedGames[gameIndex].numberOfWinners);
+    function getWinners(uint256 _gameIndex) public view returns(address[] memory _winners){
+        _winners = new address[](finishedGames[_gameIndex].numberOfWinners);
 
-        for(uint256 i = 0; i < finishedGames[gameIndex].numberOfWinners; i++){
-            _winners[i] = finishedGames[gameIndex].winners[i];
+        for(uint256 i = 0; i < finishedGames[_gameIndex].numberOfWinners; i++){
+            _winners[i] = finishedGames[_gameIndex].winners[i];
         }
 
         return _winners;
@@ -335,12 +335,12 @@ contract Lottery {
     // private functions
     // /////////////////////////////////////////////////////////////////
 
-    function createNewGame(uint256 gameLength) private view returns(Game memory) {
+    function createNewGame(uint256 _gameLength) private view returns(Game memory) {
         uint256[] memory luckyNumbers;
         Game memory newGame = Game({
             startBlock: block.number,
-            endBlock: block.number + gameLength,
-            drawBlock: block.number + gameLength + NUMBERS_PER_TICKET,
+            endBlock: block.number + _gameLength,
+            drawBlock: block.number + _gameLength + NUMBERS_PER_TICKET,
             luckyNumbers: luckyNumbers,
             numberOfParticipants: 0,
             numberOfWinners: 0,
