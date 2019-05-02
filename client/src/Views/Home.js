@@ -103,8 +103,8 @@ class App extends Component {
 
     this.setState({
       gameEnded: await this.state.contract.methods.hasGameEnded().call(),
-      minNumber: parseInt(await this.state.contract.methods.getMinNumber().call(), 10),
-      maxNumber: parseInt(await this.state.contract.methods.getMaxNumber().call(), 10),
+      minNumber: parseInt(await this.state.contract.methods.MIN_NUMBER().call(), 10),
+      maxNumber: parseInt(await this.state.contract.methods.MAX_NUMBER().call(), 10),
       constants: {
         numbersPerTicket: parseInt(await this.state.contract.methods.NUMBERS_PER_TICKET().call(), 10)
       }
