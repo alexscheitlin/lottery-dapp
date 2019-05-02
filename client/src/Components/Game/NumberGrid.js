@@ -24,7 +24,7 @@ const numberGrid = (props) => {
           <GridNumber 
           key={index}
           value={gridNumber}
-          activeNumber={props.activeNumber}
+          activeNumbers={props.activeNumbers}
           onClick={props.onClick}/>
         )
       })
