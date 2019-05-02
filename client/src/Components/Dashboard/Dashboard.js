@@ -1,17 +1,17 @@
-import React from 'react'
+import React from "react";
 
-import Jackpot from './Jackpot';
-import Drawing from './Drawing';
-import Winnings from './Winnings';
-import Status from './Status';
+import Jackpot from "./Jackpot";
+import Drawing from "./Drawing";
+import Winnings from "./Winnings";
+import Status from "./Status";
 
-import { Segment, Grid } from 'semantic-ui-react';
+import { Segment, Grid } from "semantic-ui-react";
 
-const dashboard = (props) => (
+const dashboard = props => (
   <Segment>
     <Grid columns={3}>
       <Grid.Row>
-        <Grid.Column verticalAlign='middle' textAlign='center'>
+        <Grid.Column verticalAlign="middle" textAlign="center">
           <Drawing
             startBlock={props.startBlock}
             currentBlock={props.currentBlock}
@@ -19,17 +19,27 @@ const dashboard = (props) => (
             drawBlock={props.drawBlock}
           />
         </Grid.Column>
-        <Grid.Column verticalAlign='middle' textAlign='center'>
+        <Grid.Column verticalAlign="middle" textAlign="center">
           <Jackpot jackpot={props.jackpot} />
         </Grid.Column>
         <Grid.Column>
-          <Status />
-          <Winnings />
+          <Grid.Row>
+            <Grid.Column>
+              <Status
+                hasGameEnded={props.gameEnded}
+                isNumberDrawable={props.isNumberDrawable}
+              />
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column>
+              <Winnings />
+            </Grid.Column>
+          </Grid.Row>
         </Grid.Column>
       </Grid.Row>
     </Grid>
   </Segment>
-
-)
+);
 
 export default dashboard;

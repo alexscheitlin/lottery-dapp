@@ -136,6 +136,8 @@ class App extends Component {
     this.updateGameBlocks(contract);
   };
 
+  
+
   updateTickets = async contract => {
     const numberOfTickets = await contract.methods.getMyTicketCountOfCurrentGame().call();
     const tickets = [];
@@ -320,6 +322,8 @@ class App extends Component {
                       currentBlock={this.state.currentBlock}
                       endBlock={this.state.endBlock}
                       drawBlock={this.state.drawBlock}
+                      gameEnded={this.state.gameEnded}
+                      isNumberDrawable={this.state.isNumberDrawable}
                     />
                     <Game
                       gameEnded={this.state.gameEnded}
