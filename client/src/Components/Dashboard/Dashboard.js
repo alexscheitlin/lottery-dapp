@@ -2,7 +2,7 @@ import React from "react";
 
 import Jackpot from "./Jackpot";
 import Drawing from "./Drawing";
-import Winnings from "./Winnings";
+import Winners from "./Winners";
 import Status from "./Status";
 
 import { Segment, Grid } from "semantic-ui-react";
@@ -33,7 +33,7 @@ const dashboard = props => (
           </Grid.Row>
           <Grid.Row>
             <Grid.Column>
-              <Winnings />
+              <Winners previousWinners={props.previousWinners} />
             </Grid.Column>
           </Grid.Row>
         </Grid.Column>

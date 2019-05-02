@@ -37,6 +37,8 @@ class App extends Component {
     minNumber: -1,
     web3: null,
 
+    previousWinners: [],
+
     showErrorModal: false,
     errorModalHeader: "",
     errorModalText: "Please try again if this was not your intention!"
@@ -134,15 +136,18 @@ class App extends Component {
     this.updateJackpot(contract);
     this.updateCurrentBlock(web3);
     this.updateGameBlocks(contract);
+    this.updatePreviousWinners(contract);
   };
 
-  
-
   updateTickets = async contract => {
-    const numberOfTickets = await contract.methods.getMyTicketCountOfCurrentGame().call();
+    const numberOfTickets = await contract.methods
+      .getMyTicketCountOfCurrentGame()
+      .call();
     const tickets = [];
-    for(let i=0; i<numberOfTickets; i++) {
-      tickets[i] = await contract.methods.getMyTicketNumbersOfCurrentGame(i).call();
+    for (let i = 0; i < numberOfTickets; i++) {
+      tickets[i] = await contract.methods
+        .getMyTicketNumbersOfCurrentGame(i)
+        .call();
     }
 
     if (this._isMounted) {
@@ -179,6 +184,47 @@ class App extends Component {
     }
   };
 
+  updatePreviousWinners = async contract => {
+    const winnersToDisplay = [];
+    const howManyWinnersToDisplay = 4;
+    const nrOfFinishedGames = await contract.methods
+      .getNumberOfFinishedGames()
+      .call();
+
+    let winnerCounter = 0;
+    for (let i = nrOfFinishedGames-1; i >= 0; i--) {
+      const game = await contract.methods.finishedGames(i).call();
+      const jackpot = game.jackpot;
+      const gameIndex = i;
+      const winnerHashes = await contract.methods.getWinners(i).call();
+      const hasWinners = winnerHashes.length > 0;
+
+      if(hasWinners && winnerCounter < howManyWinnersToDisplay) {
+        for(let el of winnerHashes){
+          if(winnerCounter === howManyWinnersToDisplay) {
+            break;
+          }
+          const winner = {
+            gameIndex: gameIndex,
+            jackpot: jackpot,
+            nrOfWinners: winnerHashes.length,
+            hash: el,
+            drawBlock: game.drawBlock
+          };
+          winnersToDisplay.push(winner);
+          winnerCounter += 1;
+        }
+      }
+      if(winnerCounter === howManyWinnersToDisplay) {
+        break;
+      }
+    }
+
+    this.setState({
+      previousWinners: winnersToDisplay
+    })
+  };
+
   /////////////////////////////////////////////////////////////////////////////
   // click handlers
   /////////////////////////////////////////////////////////////////////////////
@@ -201,7 +247,7 @@ class App extends Component {
     }
 
     // check all ticket numbers
-    for(const number of numbers) {
+    for (const number of numbers) {
       if (!this.isValid(number)) {
         const minNumber = this.state.minNumber;
         const maxNumber = this.state.maxNumber;
@@ -237,7 +283,7 @@ class App extends Component {
       alert("Game is not ready to draw!");
       return;
     }
-    
+
     await contract.methods
       .endGame()
       .send({ from: accounts[0] })
@@ -324,6 +370,7 @@ class App extends Component {
                       drawBlock={this.state.drawBlock}
                       gameEnded={this.state.gameEnded}
                       isNumberDrawable={this.state.isNumberDrawable}
+                      previousWinners={this.state.previousWinners}
                     />
                     <Game
                       gameEnded={this.state.gameEnded}
