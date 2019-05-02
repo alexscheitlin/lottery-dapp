@@ -268,6 +268,11 @@ contract Lottery {
         return block.number;
     }
 
+    // get luck numbers of a specific (finished) game
+    function getLuckyNumbers(uint256 _gameIndex) public view returns(uint256[] memory){
+        return finishedGames[_gameIndex].luckyNumbers;
+    }
+
     // get all participants in a specific game
     function getParticipants(uint256 gameIndex) public view returns(address[] memory _participantsAddr){
         _participantsAddr = new address[](finishedGames[gameIndex].numberOfParticipants);
