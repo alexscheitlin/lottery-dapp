@@ -14,8 +14,11 @@ const pastGame = props => (
         jackpot={game.jackpot}
         numberOfWinners={game.numberOfWinners}
         numberOfParticipants={game.numberOfParticipants}
+        nrOfPastGames={props.nrOfPastGames}
         endBlock={game.endBlock}
         drawBlock={game.drawBlock}
+        getParticipants={props.getParticipants}
+        getWinners={props.getWinners}
       />
     ))}
   </Card.Group>

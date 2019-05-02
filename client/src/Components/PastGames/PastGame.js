@@ -66,7 +66,14 @@ const pastGame = props => (
           </Grid.Row>
           <Grid.Row>
             <Grid.Column textAlign="center">
-              <PastGameModal jackpot={props.jackpot} />
+              <PastGameModal
+                jackpot={props.jackpot}
+                nrOfPastGames={props.nrOfPastGames}
+                index={props.index}
+                getParticipants={props.getParticipants}
+                getWinners={props.getWinners}
+                numberOfWinners={props.numberOfWinners}
+              />
             </Grid.Column>
           </Grid.Row>
         </Grid>
