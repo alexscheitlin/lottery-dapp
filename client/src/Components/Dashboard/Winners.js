@@ -19,8 +19,10 @@ const winners = props => {
               {winner.hash}
             </List.Header>
             <List.Description>
-              an amazing {weiToEther(winner.jackpot / winner.nrOfWinners)}{" "}
-              <Icon name="ethereum" /> in block #{winner.drawBlock}
+              won an amazing{" "}
+              <strong>{weiToEther(winner.jackpot / winner.nrOfWinners)}</strong>
+              <Icon name="ethereum" />
+              in block #{winner.drawBlock}
             </List.Description>
           </List.Content>
         </List.Item>
