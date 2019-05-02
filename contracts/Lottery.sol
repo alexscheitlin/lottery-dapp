@@ -5,19 +5,19 @@ import "./RandomNumberOracle.sol";
 contract Lottery {
     
     uint256 constant GAME_LENGTH = 3;          // number of blocks
-    uint256 constant DRAW_PERIOD = 1;          // number of blocks
     uint256 constant TICKET_PRICE = 1 ether;
     uint256 constant REFUND_AMOUNT = 0.1 ether;
     uint256 constant MIN_NUMBER = 1;
     uint256 constant MAX_NUMBER = 5;
     uint256 constant MAX_AMOUNT_TICKETS = 3;
     uint256 constant MAX_PARTICIPANTS = 50;
+    uint256 constant NUMBERS_PER_TICKET = 1;
     
     struct Game {
         uint256 startBlock;
         uint256 endBlock;
         uint256 drawBlock;
-        uint256 luckyNumber;
+        uint256[] luckyNumbers;
         mapping (uint256 => Participant) participants;
         mapping (uint256 => address payable) winners;
         
@@ -34,7 +34,7 @@ contract Lottery {
     
     struct Participant {
         address payable addr;
-        uint256[] numbers;
+        uint256[][] tickets;
     }
     
     Game public currentGame;
@@ -53,29 +53,34 @@ contract Lottery {
     // pubic functions
     // /////////////////////////////////////////////////////////////////
     
-    function buyTicket(uint256 number) public payable {
+    function buyTicket(uint256[] memory numbers) public payable {
         // verify that enough ether was sent
         require(msg.value == TICKET_PRICE);
-        
-        // verify that the number is not too small
-        require(number >= MIN_NUMBER);
-        
-        // verify that the number is not too large
-        require(number <= MAX_NUMBER);
         
         // verify that the current game is ongoing
         require(this.isGameOngoing());
         
-        // record the sender's address and the received number
+        // verify that enough numbers are given
+        require(numbers.length == NUMBERS_PER_TICKET);
+        
+        // verify that the numbers are not too small or too large
+        for (uint256 i=0; i<numbers.length; i++) {
+            require(numbers[i] >= MIN_NUMBER);
+            require(numbers[i] <= MAX_NUMBER);
+        }
+        
+        // verify that every number is only represented at max once
+        // TODO
+        
+        // record the sender's address and the received numbers
         bool foundParticipant = false;
         for (uint256 i=0; i<currentGame.numberOfParticipants; i++) {
             // add number to existing participant
             if (currentGame.participants[i].addr == msg.sender) {
-                
                 // verify that buyer has not bought too many tickets
-                require(currentGame.participants[i].numbers.length < MAX_AMOUNT_TICKETS);
+                require(currentGame.participants[i].tickets.length < MAX_AMOUNT_TICKETS);
                 
-                currentGame.participants[i].numbers.push(number);
+                currentGame.participants[i].tickets.push(numbers);
                 foundParticipant = true;
                 break;
             }
@@ -86,12 +91,12 @@ contract Lottery {
             require(currentGame.numberOfParticipants < MAX_PARTICIPANTS);
             
             // create new participant
-            uint256[] memory numbers = new uint256[](1);
-            numbers[0] = number;
+            uint256[][] memory tickets = new uint256[][](1);
+            tickets[0] = numbers;
             
             Participant memory p = Participant({
                 addr: msg.sender,
-                numbers: numbers
+                tickets: tickets
             });
             
             currentGame.participants[currentGame.numberOfParticipants++] = p;
@@ -102,8 +107,13 @@ contract Lottery {
         // verify that game has ended and numbers are drawable
         require(this.isNumberDrawable());
         
-        // draw lucky number via oracle SC
-        currentGame.luckyNumber = oracle.getRandomNumber(MIN_NUMBER, MAX_NUMBER, currentGame.drawBlock);
+        // draw lucky numbers via oracle SC
+        uint256[] memory luckyNumbers = new uint256[](NUMBERS_PER_TICKET);
+        for (uint256 i=0; i<NUMBERS_PER_TICKET; i++) {
+            luckyNumbers[i] = oracle.getRandomNumber(MIN_NUMBER, MAX_NUMBER, currentGame.drawBlock - i);
+        }
+        
+        currentGame.luckyNumbers = luckyNumbers;
         
         // keep track of jackpot
         currentGame.jackpot = getJackpot();
@@ -117,13 +127,41 @@ contract Lottery {
         // refund caller and payout winners
         if (currentGame.numberOfParticipants > 0) {
             // determine winners
-            for (uint256 i=0; i<currentGame.numberOfParticipants; i++) {
-                for (uint256 j=0; j<currentGame.participants[i].numbers.length; j++) {
-                    if (currentGame.participants[i].numbers[j] == currentGame.luckyNumber) {
+            for (uint256 i=0; i<currentGame.numberOfParticipants; i++) { // participant i
+                for (uint256 j=0; j<currentGame.participants[i].tickets.length; j++) { // ticket j
+                    // TODO: this is very inefficient (maybe use mappings to determine whether a user has all lucky numbers within one ticket)
+                    bool isWinnerTicket = true;
+                    for (uint256 k=0; k<currentGame.luckyNumbers.length; k++) { // lucky number k
+                        
+                        // check if a lucky number is present in this ticket
+                        bool isNumberInTicket = false;
+                        for (uint256 l=0; l<currentGame.participants[i].tickets[j].length; l++) { // number l of ticket j
+                            if (currentGame.participants[i].tickets[j][l] == currentGame.luckyNumbers[k]) {
+                                // lucky number is present in this tickets
+                                // => no need to look at the other numbers of this ticket for this lucky number
+                                isNumberInTicket = true;
+                                break;
+                            }
+                        }
+                        
+                        // if the lucky number is not present in the ticket, this ticket is not a winner ticket
+                        // => no need to check the remaining lucky numbers
+                        if (!isNumberInTicket) {
+                            isWinnerTicket = false;
+                            break;
+                        }
+                        
+                    }
+                    
+                    if (isWinnerTicket) {
+                        // add participant as winner
                         currentGame.winners[currentGame.numberOfWinners++] = currentGame.participants[i].addr;
-
+    
                         // archiving winners
                         finishedGames[numberOfGames].winners[finishedGames[numberOfGames].numberOfWinners++] = currentGame.participants[i].addr;
+                        
+                        // no need to search for a second winner ticket
+                        break;
                     }
                 }
                 // archiving participants
@@ -145,13 +183,26 @@ contract Lottery {
         currentGame = createNewGame(GAME_LENGTH);
     }
     
-    // returns the tickets (= numbers) in the current game associated with the sender's address
-    function getMyTickets() public view returns(uint256[] memory) {
+    // returns the number of tickets in the current game associated with the sender's address
+    function getMyTicketCountOfCurrentGame() public view returns(uint256) {
+        uint256 numberOfTickets = 0;
+            
+        for (uint256 i=0; i<currentGame.numberOfParticipants; i++) {
+            if (currentGame.participants[i].addr == msg.sender) {
+                numberOfTickets = currentGame.participants[i].tickets.length;
+                break;
+            }
+        }
+        return numberOfTickets;
+    }
+    
+    // returns the numbers of a ticket in the current game associated with the sender's address
+    function getMyTicketNumbersOfCurrentGame(uint256 _ticketIndex) public view returns(uint256[] memory) {
         uint256[] memory numbers;
             
         for (uint256 i=0; i<currentGame.numberOfParticipants; i++) {
             if (currentGame.participants[i].addr == msg.sender) {
-                numbers = currentGame.participants[i].numbers;
+                numbers = currentGame.participants[i].tickets[_ticketIndex];
                 break;
             }
         }
@@ -238,12 +289,21 @@ contract Lottery {
         
         return _winners;
     }
-
-    // get the tickets of an address in a specific game
-    function getParticipantNumbers(uint _gameIndex, address _address) public view returns(uint256[] memory){
+    
+    // get the number of tickets of an address in a specific game
+    function getTicketCount(uint256 _gameIndex, address _address) public view returns(uint256) {
         for(uint256 i = 0; i < finishedGames[_gameIndex].numberOfParticipants; i++){
             if(finishedGames[_gameIndex].participants[i].addr == _address){
-               return finishedGames[_gameIndex].participants[i].numbers;
+               return finishedGames[_gameIndex].participants[i].tickets.length;
+            }
+        }
+    }
+
+    // get the numbers of a ticket of an address in a specific game
+    function getTicketNumbers(uint256 _gameIndex, uint256 _ticketIndex, address _address) public view returns(uint256[] memory){
+        for(uint256 i = 0; i < finishedGames[_gameIndex].numberOfParticipants; i++){
+            if(finishedGames[_gameIndex].participants[i].addr == _address){
+               return finishedGames[_gameIndex].participants[i].tickets[_ticketIndex];
             }
         }
     }
@@ -257,11 +317,12 @@ contract Lottery {
     // /////////////////////////////////////////////////////////////////
     
     function createNewGame(uint256 gameLength) private view returns(Game memory) {
+        uint256[] memory luckyNumbers;
         Game memory newGame = Game({
             startBlock: block.number,
             endBlock: block.number + gameLength,
-            drawBlock: block.number + gameLength + DRAW_PERIOD,
-            luckyNumber: 0,
+            drawBlock: block.number + gameLength + NUMBERS_PER_TICKET,
+            luckyNumbers: luckyNumbers,
             numberOfParticipants: 0,
             numberOfWinners: 0,
             jackpot: 0,
