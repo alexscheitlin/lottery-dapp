@@ -131,12 +131,7 @@ contract Lottery {
         require(this.isNumberDrawable());
         
         // draw lucky numbers via oracle SC
-        uint256[] memory luckyNumbers = new uint256[](NUMBERS_PER_TICKET);
-        for (uint256 i=0; i<NUMBERS_PER_TICKET; i++) {
-            luckyNumbers[i] = oracle.getRandomNumber(MIN_NUMBER, MAX_NUMBER, currentGame.drawBlock - i);
-        }
-        
-        currentGame.luckyNumbers = luckyNumbers;
+        currentGame.luckyNumbers = getLuckyNumbers();
         
         // keep track of jackpot
         currentGame.jackpot = getJackpot();
@@ -147,57 +142,13 @@ contract Lottery {
         // archive all the statically allocated values
         finishedGames[numberOfGames] = currentGame;
         
-        // refund caller and payout winners
         if (currentGame.numberOfParticipants > 0) {
-            // determine winners
-            for (uint256 i=0; i<currentGame.numberOfParticipants; i++) { // participant i
-                for (uint256 j=0; j<currentGame.participants[i].tickets.length; j++) { // ticket j
-                    // TODO: this is very inefficient (maybe use mappings to determine whether a user has all lucky numbers within one ticket)
-                    bool isWinnerTicket = true;
-                    for (uint256 k=0; k<currentGame.luckyNumbers.length; k++) { // lucky number k
-                        
-                        // check if a lucky number is present in this ticket
-                        bool isNumberInTicket = false;
-                        for (uint256 l=0; l<currentGame.participants[i].tickets[j].length; l++) { // number l of ticket j
-                            if (currentGame.participants[i].tickets[j][l] == currentGame.luckyNumbers[k]) {
-                                // lucky number is present in this tickets
-                                // => no need to look at the other numbers of this ticket for this lucky number
-                                isNumberInTicket = true;
-                                break;
-                            }
-                        }
-                        
-                        // if the lucky number is not present in the ticket, this ticket is not a winner ticket
-                        // => no need to check the remaining lucky numbers
-                        if (!isNumberInTicket) {
-                            isWinnerTicket = false;
-                            break;
-                        }
-                        
-                    }
-                    
-                    if (isWinnerTicket) {
-                        // add participant as winner
-                        currentGame.winners[currentGame.numberOfWinners++] = currentGame.participants[i].addr;
-    
-                        // archiving winners
-                        finishedGames[numberOfGames].winners[finishedGames[numberOfGames].numberOfWinners++] = currentGame.participants[i].addr;
-                        
-                        // no need to search for a second winner ticket
-                        break;
-                    }
-                }
-                // archiving participants
-                finishedGames[numberOfGames].participants[i] = currentGame.participants[i];
-            }
+            setWinners();
         
             // refund caller
             msg.sender.transfer(REFUND_AMOUNT);
         
-            // payout winners
-            for (uint256 i=0; i<currentGame.numberOfWinners; i++) {
-                currentGame.winners[i].transfer(currentGame.jackpot / currentGame.numberOfWinners);
-            }
+            payoutWinners();
         }
 
         numberOfGames++;
@@ -213,7 +164,7 @@ contract Lottery {
     // returns the number of tickets in the current game associated with the sender's address
     function getMyTicketCountOfCurrentGame() public view returns(uint256) {
         uint256 numberOfTickets = 0;
-            
+
         for (uint256 i=0; i<currentGame.numberOfParticipants; i++) {
             if (currentGame.participants[i].addr == msg.sender) {
                 numberOfTickets = currentGame.participants[i].tickets.length;
@@ -226,7 +177,7 @@ contract Lottery {
     // returns the numbers of a ticket in the current game associated with the sender's address
     function getMyTicketNumbersOfCurrentGame(uint256 _ticketIndex) public view returns(uint256[] memory) {
         uint256[] memory numbers;
-            
+
         for (uint256 i=0; i<currentGame.numberOfParticipants; i++) {
             if (currentGame.participants[i].addr == msg.sender) {
                 numbers = currentGame.participants[i].tickets[_ticketIndex];
@@ -349,5 +300,62 @@ contract Lottery {
         });
 
         return newGame;
+    }
+
+    function setWinners() private{
+        for (uint256 i=0; i<currentGame.numberOfParticipants; i++) { // participant i
+            for (uint256 j=0; j<currentGame.participants[i].tickets.length; j++) { // ticket j
+                // TODO: this is very inefficient (maybe use mappings to determine whether a user has all lucky numbers within one ticket)
+                bool isWinnerTicket = true;
+                for (uint256 k=0; k<currentGame.luckyNumbers.length; k++) { // lucky number k
+                    
+                    // check if a lucky number is present in this ticket
+                    bool isNumberInTicket = false;
+                    for (uint256 l=0; l<currentGame.participants[i].tickets[j].length; l++) { // number l of ticket j
+                        if (currentGame.participants[i].tickets[j][l] == currentGame.luckyNumbers[k]) {
+                            // lucky number is present in this tickets
+                            // => no need to look at the other numbers of this ticket for this lucky number
+                            isNumberInTicket = true;
+                            break;
+                        }
+                    }
+                    
+                    // if the lucky number is not present in the ticket, this ticket is not a winner ticket
+                    // => no need to check the remaining lucky numbers
+                    if (!isNumberInTicket) {
+                        isWinnerTicket = false;
+                        break;
+                    }
+                    
+                }
+                
+                if (isWinnerTicket) {
+                    // add participant as winner
+                    currentGame.winners[currentGame.numberOfWinners++] = currentGame.participants[i].addr;
+
+                    // archiving winners
+                    finishedGames[numberOfGames].winners[finishedGames[numberOfGames].numberOfWinners++] = currentGame.participants[i].addr;
+                    
+                    // no need to search for a second winner ticket
+                    break;
+                }
+            }
+            // archiving participants
+            finishedGames[numberOfGames].participants[i] = currentGame.participants[i];
+        }
+    }
+
+    function payoutWinners() private{
+        for (uint256 i=0; i<currentGame.numberOfWinners; i++) {
+            currentGame.winners[i].transfer(currentGame.jackpot / currentGame.numberOfWinners);
+        }
+    }
+
+    function getLuckyNumbers() private view returns(uint256[] memory luckyNumbers){
+        luckyNumbers = new uint256[](NUMBERS_PER_TICKET);
+        for (uint256 i=0; i<NUMBERS_PER_TICKET; i++) {
+            luckyNumbers[i] = oracle.getRandomNumber(MIN_NUMBER, MAX_NUMBER, currentGame.drawBlock - i);
+        }
+        return luckyNumbers;
     }
 }
