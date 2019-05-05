@@ -39,13 +39,21 @@ contract Lottery {
     // constants
     // /////////////////////////////////////////////////////////////////
 
-    uint256 public constant GAME_LENGTH = 3;            // number of blocks
+    // defines the number of blocks one game is open for participants to buy tickets
+    uint256 public constant GAME_LENGTH = 3;
+    // defines the maximal number of tickets a user can buy. This is necessary in order to limit the amount of gas that is used for the automatic payout function at the end of a game. If a game has too many tickets, this transaction costs too much gas to be accepted.
     uint256 public constant MAX_AMOUNT_TICKETS = 3;
+    // defines the number of participants in one game. This is necessary for the same reason as MAX_AMOUNT_TICKETS.
     uint256 public constant MAX_PARTICIPANTS = 50;
-    uint256 public constant MAX_NUMBER = 5;             // maximum allowed number in a ticket (inclusive)
-    uint256 public constant MIN_NUMBER = 1;             // minimum required number in a ticket (inclusive)
+    // defines the highest number one can buy in a game (including this number)
+    uint256 public constant MAX_NUMBER = 5;
+    // defines the smallest number one can buy in a game (inlcuding this number)
+    uint256 public constant MIN_NUMBER = 1;
+    // defines how many numbers must be submitted per ticket and therefore, it also defines how many block are in the drawing phase. This is due to the fact that every block in the drawing phase is used as the seed for one random number.
     uint256 public constant NUMBERS_PER_TICKET = 2;
+    // defines the refund amount to the address that evaluates the current game and starts a new one.
     uint256 public constant REFUND_AMOUNT = 0.1 ether;
+    // defines the price for one ticket
     uint256 public constant TICKET_PRICE = 1 ether;
 
 
