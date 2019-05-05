@@ -7,6 +7,7 @@ import LotteryContract from "../contracts/Lottery.json";
 import getWeb3 from "../utils/getWeb3";
 
 import { Grid, Pagination } from "semantic-ui-react";
+import { toast } from 'react-toastify';
 
 class History extends Component {
   _isMounted = false;
@@ -50,7 +51,7 @@ class History extends Component {
     } catch (error) {
       // catch any errors for any of the above operations
       console.error(error);
-      alert(
+      toast.error(
         "Failed to load web3, accounts, or contract. Check console for details."
       );
     }

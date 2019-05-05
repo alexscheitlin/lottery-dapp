@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import LotteryContract from "../contracts/Lottery.json";
 import getWeb3 from "../utils/getWeb3";
 import { weiToEther, etherToWei } from "../utils/conversion";
+import { toast } from 'react-toastify';
 
 import Wrapper from "../Components/shared/Wrapper";
 import Loading from "../Components/shared/Loading";
@@ -85,7 +86,7 @@ class App extends Component {
     } catch (error) {
       // catch any errors for any of the above operations
       console.error(error);
-      alert(
+      toast.info(
         "Failed to load web3, accounts, or contract. Check console for details."
       );
     }
@@ -232,14 +233,14 @@ class App extends Component {
 
     // do not allow tickets to be purchased after the current game has ended
     if (hasGameEnded) {
-      alert("Game has ended!");
+      toast.info("Game has ended!");
       return;
     }
 
     // check that enough numbers are given
     const requiredNumbers = this.state.constants.numbersPerTicket;
     if (numbers.length !== requiredNumbers) {
-      alert(`Please select ${requiredNumbers} ${requiredNumbers===1 ? "number" : "numbers"}.`);
+      toast.error(`Please select ${requiredNumbers} ${requiredNumbers===1 ? "number" : "numbers"}.`);
       return;
     }
 
@@ -248,7 +249,7 @@ class App extends Component {
       if (!this.isValid(number)) {
         const minNumber = this.state.constants.minNumber;
         const maxNumber = this.state.constants.maxNumber;
-        alert(`All numbers must be between ${minNumber} and ${maxNumber}!`);
+        toast.error(`All numbers must be between ${minNumber} and ${maxNumber}!`);
         return;
       }
     }
@@ -272,12 +273,12 @@ class App extends Component {
     const hasGameEnded = await contract.methods.hasGameEnded().call();
 
     if (!hasGameEnded) {
-      alert("Game is still running!");
+      toast.info("Game is still running!");
       return;
     }
 
     if (!this.state.isNumberDrawable) {
-      alert("Game is not ready to draw!");
+      toast.info("Game is not ready to draw!");
       return;
     }
 
