@@ -9,13 +9,6 @@ class Game extends Component {
     activeNumbers: []
   };
 
-  // TODO: is this one needed? 'handleChange' seems to never be called and 'this.state.number' never to be used
-  handleChange = e => {
-    this.setState({
-      number: e.target.value
-    });
-  };
-
   numberClickHandler = (number) => {
     const activeNumbers = this.state.activeNumbers;
     const activeNumberIndex = activeNumbers.indexOf(number);
