@@ -8,6 +8,8 @@ import Home from "./Views/Home";
 import History from "./Views/History";
 
 import { Menu, Segment, Container, Icon, Header } from "semantic-ui-react";
+import {ToastContainer} from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 class App extends Component {
   state = { activeItem: "" };
@@ -26,6 +28,19 @@ class App extends Component {
             style={{ padding: "1em 0em" }}
             vertical
           >
+            <ToastContainer
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnVisibilityChange
+              draggable
+              pauseOnHover
+            />
+            {/* Same as */}
+            <ToastContainer />
             <Header as="h1" textAlign="center" style={{marginTop: '1rem'}} icon>
               <Icon inverted name="gem" />
               Lottery dApp
