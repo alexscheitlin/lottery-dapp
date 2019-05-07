@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import Ticket from './Ticket';
 
-import { Segment, Header, Card } from "semantic-ui-react";
+import { Segment, Card } from "semantic-ui-react";
 
 class Tickets extends Component {
 

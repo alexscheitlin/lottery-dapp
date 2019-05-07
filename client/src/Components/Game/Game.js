@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import NumberGrid from "./NumberGrid";
 
-import { Segment, Header, Input, Button } from "semantic-ui-react";
+import { Segment, Button } from "semantic-ui-react";
 
 class Game extends Component {
   state = {
