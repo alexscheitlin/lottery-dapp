@@ -316,8 +316,9 @@ class App extends Component {
       return false;
     }
 
-    // TODO: do not use hard coded values (use values from this.state)
-    return inputToCheck > 0 && inputToCheck < 6;
+    const minNumber = this.state.constants.minNumber;
+    const maxNumber = this.state.constants.maxNumber;
+    return inputToCheck >= minNumber && inputToCheck <= maxNumber;
   };
 
   /////////////////////////////////////////////////////////////////////////////
