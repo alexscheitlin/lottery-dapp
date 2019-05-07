@@ -10,7 +10,7 @@ const pastGame = props => (
     <Card.Content>
       <Card.Header>
         {
-          props.luckyNumbers.map((number) => {
+          props.luckyNumbers.map((number, index) => {
             return (
               <Label
                 circular
@@ -19,6 +19,7 @@ const pastGame = props => (
                   color: "white"
                 }}
                 size="huge"
+                key={index}
               >
                 {number}
               </Label>
