@@ -334,25 +334,21 @@ class App extends Component {
         </div>
         <Wrapper>
           <Grid>
-            <Grid.Row>
+            <Grid.Row style={{ textAlign: "center", marginTop: "2rem" }}>
               <Grid.Column width={8}>
-                <div style={{ textAlign: "center", margin: "1rem" }}>
-                  <Segment>
-                    <strong>Account: </strong>
-                    {this.state.activeAccount}
-                  </Segment>
-                </div>
+                <Segment>
+                  <strong>Account: </strong>
+                  {this.state.activeAccount}
+                </Segment>
               </Grid.Column>
               <Grid.Column width={8}>
-                <div style={{ textAlign: "center", margin: "1rem" }}>
-                  <Segment>
-                    Your account has{" "}
-                    <strong>
-                      {weiToEther(this.state.activeAccountBalance)}
-                    </strong>{" "}
-                    ETH
-                  </Segment>
-                </div>
+                <Segment>
+                  Your account has{" "}
+                  <strong>
+                    {weiToEther(this.state.activeAccountBalance)}
+                  </strong>{" "}
+                  ETH
+                </Segment>
               </Grid.Column>
             </Grid.Row>
             <Grid.Row>
