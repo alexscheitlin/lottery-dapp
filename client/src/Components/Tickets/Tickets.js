@@ -11,17 +11,19 @@ class Tickets extends Component {
       <Segment>
         <Card.Group>
         {
-          this.props.tickets !== null ? 
-            this.props.tickets.map((ticketNumbers, index) => {
-              return (
-                <Ticket
-                  key={index}
-                  index={index + 1}
-                  numbers={ticketNumbers}
-                />
-              )
-            }) :
-            null
+          this.props.tickets !== null ?
+            this.props.tickets.length > 0 ?
+              this.props.tickets.map((ticketNumbers, index) => {
+                return (
+                  <Ticket
+                    key={index}
+                    index={index + 1}
+                    numbers={ticketNumbers}
+                  />
+                )
+              })
+            : <p>You have no tickets purchased for this game!</p>
+          : null
         }
         </Card.Group>
       </Segment>
