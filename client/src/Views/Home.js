@@ -295,7 +295,6 @@ class App extends Component {
     this.fetchData();
   };
 
-  // TODO: remove as soon as it is not needed anymore
   skipBlockHandler = async () => {
     const { contract, accounts } = this.state;
 
@@ -327,8 +326,7 @@ class App extends Component {
   render() {
     return (
       <div>
-        {/* TODO: remove as soon as it is not needed anymore*/}
-        <div style={{ textAlign: "center", margin: "1rem" }}>
+        <div style={{ position: "absolute", bottom: 0, right: 0, zIndex: 100, textAlign: "center", margin: "1rem" }}>
           <Button secondary onClick={this.skipBlockHandler}>
             Skip Block
           </Button>
