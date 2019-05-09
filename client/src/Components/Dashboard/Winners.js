@@ -5,16 +5,16 @@ import { List, Icon } from "semantic-ui-react";
 import { weiToEther } from "../../utils/conversion";
 
 const winners = props => {
-  const highlight = {
-    color: "rgb(93, 133, 164)"
-  };
   return (
     <List divided relaxed>
       {props.previousWinners.map((winner, index) => (
         <List.Item key={winner.hash + index}>
           <List.Content>
             <List.Header
-              style={winner.hash === props.activeAccount ? highlight : null}
+              style={{
+                color: winner.hash === props.activeAccount ? "rgb(93, 133, 164)" : "rgba(0,0,0,.87)",
+                overflowWrap: "break-word"
+              }}
             >
               {winner.hash}
             </List.Header>
