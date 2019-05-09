@@ -99,7 +99,7 @@ class History extends Component {
     }
 
     let numberOfPages =
-      numberOfPages % batch !== 0
+    nrOfPastGames % batch !== 0
         ? Math.floor(nrOfPastGames / batch) + 1
         : Math.floor(nrOfPastGames / batch);
 
