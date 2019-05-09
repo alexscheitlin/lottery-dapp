@@ -133,22 +133,22 @@ class App extends Component {
       activeAccountBalance: await web3.eth.getBalance(activeAccount)
     });
 
-    this.updateTickets(contract);
+    this.updateTickets(contract, activeAccount);
     this.updateJackpot(contract);
     this.updateCurrentBlock(web3);
     this.updateGameBlocks(contract);
     this.updatePreviousWinners(contract);
   };
 
-  updateTickets = async contract => {
+  updateTickets = async (contract, from) => {
     const numberOfTickets = await contract.methods
       .getMyTicketCountOfCurrentGame()
-      .call();
+      .call({from: from});
     const tickets = [];
     for (let i = 0; i < numberOfTickets; i++) {
       tickets[i] = await contract.methods
         .getMyTicketNumbersOfCurrentGame(i)
-        .call();
+        .call({from: from});
     }
 
     if (this._isMounted) {
