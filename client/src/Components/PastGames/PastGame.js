@@ -57,7 +57,7 @@ const pastGame = props => (
             <Grid.Column textAlign="center">
               <Statistic size="tiny">
                 <Statistic.Value>
-                  <Icon name="square outline" /> # {props.endBlock || 0}
+                  <Icon name="cube" /> # {props.endBlock || 0}
                 </Statistic.Value>
                 <Statistic.Label>End Block</Statistic.Label>
               </Statistic>
@@ -65,7 +65,7 @@ const pastGame = props => (
             <Grid.Column textAlign="center">
               <Statistic size="tiny">
                 <Statistic.Value>
-                  <Icon name="square outline" /> # {props.drawBlock || 0}
+                  <Icon name="cube" /> # {props.drawBlock || 0}
                 </Statistic.Value>
                 <Statistic.Label>Draw Block</Statistic.Label>
               </Statistic>
