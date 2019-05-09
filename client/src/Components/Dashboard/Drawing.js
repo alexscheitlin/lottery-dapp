@@ -3,7 +3,7 @@ import React from 'react'
 import { Statistic, Icon } from 'semantic-ui-react';
 
 const drawing = (props) => {
-  const currentBlock = { label: "current block", number: props.currentBlock, color:"" };
+  const currentBlock = { label: "current block", number: props.currentBlock };
   const startBlock = { label: "start block", number: props.startBlock, color:"grey" };
   const endBlock = { label: "end block", number: props.endBlock, color:"grey" };
   const drawBlock = { label: "draw block", number: props.drawBlock, color:"grey" };
