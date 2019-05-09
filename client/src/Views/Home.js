@@ -338,7 +338,7 @@ class App extends Component {
               <Grid.Column width={8}>
                 <Segment>
                   <strong>Account: </strong>
-                  {this.state.activeAccount}
+                  <span style={{ overflowWrap: "break-word"}}>{this.state.activeAccount}</span>
                 </Segment>
               </Grid.Column>
               <Grid.Column width={8}>
