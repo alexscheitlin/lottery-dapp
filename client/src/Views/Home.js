@@ -329,7 +329,7 @@ class App extends Component {
       <div>
         <div style={{ position: "absolute", bottom: 0, right: 0, zIndex: 100, textAlign: "center", margin: "1rem" }}>
           <Button secondary onClick={this.skipBlockHandler}>
-            Skip Block
+            Draw One Number
           </Button>
         </div>
         <Wrapper>
