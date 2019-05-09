@@ -12,7 +12,13 @@ const statusStyle = {
 const status = props => {
   const ended = (
     <div style={statusStyle}>
-      game finished <Icon color="red" name="circle" />
+      game finished, please initiate payout <Icon color="red" name="circle" />
+    </div>
+  );
+
+  const drawing = (
+    <div style={statusStyle}>
+      drawing numbers <Icon className="pulsate-fwd" color="orange" name="circle" />
     </div>
   );
 
@@ -22,7 +28,13 @@ const status = props => {
     </div>
   );
 
-  return <div>{props.hasGameEnded ? ended : running}</div>;
+  if (props.hasGameEnded && props.isNumberDrawable) {
+    return ended;
+  } else if (props.hasGameEnded) {
+    return drawing;
+  } else {
+    return running;
+  }
 };
 
 export default status;
