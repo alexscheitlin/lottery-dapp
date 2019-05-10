@@ -25,9 +25,9 @@ truffle unbox react
 - [Git](https://git-scm.com/) command line interface
 - [Node.js](https://nodejs.org/) command line interface
 - [Metamask Extension](https://metamask.io/) for your browser (including wallet)
-- [Ganache-CLI](https://github.com/trufflesuite/ganache-cli) to spin up a blockchain with instant mining
-
-> We **don't** use [Ganache](https://truffleframework.com/ganache) at the moment, as it fails somehow. Everything works though with Ganache-CLI. If at some point we switch back, the README should be updated.
+- Ganache
+    - [Ganache-CLI](https://github.com/trufflesuite/ganache-cli) to spin up a blockchain with instant mining
+    - [Ganache](https://truffleframework.com/ganache) version 2.0.1 or newer
 
 ## Setup
 
