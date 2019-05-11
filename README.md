@@ -2,23 +2,23 @@
 This branch is created for demonstrating how the lottery behaves with no winners and how the jackpot is carried over to the next lottery. 
 
 ## Demo Setting
-1. Ganache is running on port 8540
-2. React App is running on port 3000
+1. Ganache is running on port 8541
+2. React App is running on port 3001
 3. Smart Contract variables:
 
 ```
 // 1 for starting the game + 2 * (buying 2 tickets for each account)
-GAME_LENGTH = 2;
-MAX_NUMBER = 42;
+GAME_LENGTH = 3;
+MAX_NUMBER = 2;
 MIN_NUMBER = 1;
-NUMBERS_PER_TICKET = 6;
+NUMBERS_PER_TICKET = 1;
 ``` 
 
 ## Demo Setup
 1. Run ganache-cli on the correct port 
 
     ```bash
-    ganache-cli --port 8540
+    ganache-cli --port 8541
     ````
 
 2. Start the `Truffle` console:
@@ -43,11 +43,11 @@ NUMBERS_PER_TICKET = 6;
    npm install
    npm start
    ```
-6. `localhost:3002` should be opened automatically in your browser
+6. `localhost:3001` should be opened automatically in your browser
 
-7. Change Metamask network to Custom RPC with the network URL "http://localhost:8540"
+7. Change Metamask network to Custom RPC with the network URL "http://localhost:8541"
 
-8. Import 2 private keys from the ganache-cli into metamask
+8. Import 1 private keys from the ganache-cli into metamask
 
 
 ## How to demonstrate two winner
