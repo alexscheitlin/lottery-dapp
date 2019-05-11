@@ -7,7 +7,6 @@ This branch is created for demonstrating how the lottery behaves with one winner
 3. Smart Contract variables:
 
 ```
-// 1 for starting the game + 2 * (buying 2 tickets for each account)
 GAME_LENGTH = 3;
 MAX_NUMBER = 2;
 MIN_NUMBER = 1;
