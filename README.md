@@ -1,24 +1,24 @@
 # Lottery dApp 
-This branch is created for demonstrating how the lottery behaves with two winners and the jackpot is split among them. 
+This branch is created for demonstrating how the lottery behaves with no winners and how the jackpot is carried over to the next lottery. 
 
 ## Demo Setting
-1. Ganache is running on port 8542
-2. React App is running on port 3002
+1. Ganache is running on port 8540
+2. React App is running on port 3000
 3. Smart Contract variables:
 
 ```
 // 1 for starting the game + 2 * (buying 2 tickets for each account)
-GAME_LENGTH = 5;
-MAX_NUMBER = 2;
+GAME_LENGTH = 2;
+MAX_NUMBER = 42;
 MIN_NUMBER = 1;
-NUMBERS_PER_TICKET = 1;
+NUMBERS_PER_TICKET = 6;
 ``` 
 
 ## Demo Setup
 1. Run ganache-cli on the correct port 
 
     ```bash
-    ganache-cli --port 8542
+    ganache-cli --port 8540
     ````
 
 2. Start the `Truffle` console:
@@ -45,15 +45,13 @@ NUMBERS_PER_TICKET = 1;
    ```
 6. `localhost:3002` should be opened automatically in your browser
 
-7. Change Metamask network to Custom RPC with the network URL "http://localhost:8542"
+7. Change Metamask network to Custom RPC with the network URL "http://localhost:8540"
 
 8. Import 2 private keys from the ganache-cli into metamask
 
 
 ## How to demonstrate two winner
-1. Buy two ticket from account1 [number 1 and 2]
-2. Switch to account2 in Metamask 
-3. Buy two tickets from account2 [number 1 and 2]
-4. Draw one number with the provided Helper-Button
-5. Check history for winners
-6. Check Metamask if jackpot was paid out
+1. Buy one ticket from account1 [any 6 numbers]
+2. Draw number with the provided Helper-Button six times (for every lucky number once)
+3. Check history for drawn numbers
+4. Check out next lottery with the carried over jackpot (note: the jackpot is 0.01 ETH smaller than the previous, due to the fact that we compansate the caller of endGame())
