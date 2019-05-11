@@ -1,5 +1,5 @@
 # Lottery dApp 
-This branch is created for demonstrating how the lottery behaves with no winners and how the jackpot is carried over to the next lottery. 
+This branch is created for demonstrating how the lottery behaves with one winner and how the jackpot is paid out. 
 
 ## Demo Setting
 1. Ganache is running on port 8541
