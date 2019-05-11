@@ -7,7 +7,7 @@ module.exports = {
 	networks: {
 		development: {
 			host: '127.0.0.1',
-			port: process.env.GANACHE_PORT || 8540,
+			port: process.env.GANACHE_PORT || 8541,
 			network_id: '*' // Match any network id
 		}
 	}

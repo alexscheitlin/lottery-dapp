@@ -51,7 +51,7 @@ NUMBERS_PER_TICKET = 1;
 
 
 ## How to demonstrate two winner
-1. Buy one ticket from account1 [any 6 numbers]
-2. Draw number with the provided Helper-Button six times (for every lucky number once)
+1. Buy two ticket from account1 [number 1 and 2]
+2. Draw number with the provided Helper-Button six times
 3. Check history for drawn numbers
-4. Check out next lottery with the carried over jackpot (note: the jackpot is 0.01 ETH smaller than the previous, due to the fact that we compansate the caller of endGame())
+4. Check Metamask for new balance
