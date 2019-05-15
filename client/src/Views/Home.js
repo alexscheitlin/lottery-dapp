@@ -17,6 +17,7 @@ import "semantic-ui-css/semantic.min.css";
 
 class App extends Component {
   _isMounted = false;
+  _contractFound = false;
 
   state = {
     constants: {
@@ -72,6 +73,11 @@ class App extends Component {
         deployedNetwork && deployedNetwork.address
       );
 
+      // check if contract was found (= address was set)
+      if (contract._address) {
+        this._contractFound = true;
+      }
+
       // set web3 and contract to the state
       if (this._isMounted) {
         this.setState({
@@ -100,7 +106,7 @@ class App extends Component {
   }, 2000);
 
   fetchInitialData = async () => {
-    if (!this._isMounted) {
+    if (!this._isMounted || !this._contractFound) {
       return;
     }
 
@@ -115,7 +121,7 @@ class App extends Component {
   };
 
   fetchData = async () => {
-    if (!this._isMounted) {
+    if (!this._isMounted || !this._contractFound) {
       return;
     }
 
@@ -353,7 +359,7 @@ class App extends Component {
             </Grid.Row>
             <Grid.Row>
               <Grid.Column>
-                {this.state.web3 ? (
+                {this.state.web3 && this._contractFound ? (
                   <div>
                     <Dashboard
                       jackpot={this.state.jackpot}

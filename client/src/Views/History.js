@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 
 class History extends Component {
   _isMounted = false;
+  _contractFound = false;
 
   state = {
     web3: null,
@@ -47,7 +48,11 @@ class History extends Component {
         });
       }
 
-      this.loadGamesOfCurrentPage(1);
+      // check if contract was found (= address was set)
+      if (contract._address) {
+        this._contractFound = true;
+        this.loadGamesOfCurrentPage(1);
+      }
     } catch (error) {
       // catch any errors for any of the above operations
       console.error(error);
@@ -65,6 +70,10 @@ class History extends Component {
   }, 2000);
 
   fetchData = async () => {
+    if (!this._isMounted || !this._contractFound) {
+      return;
+    }
+
     this.loadGamesOfCurrentPage(this.state.activePage);
   };
 
